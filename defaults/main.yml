@@ -1,0 +1,12 @@
+---
+step_ca_root_dir: /etc/step-ca
+
+step_ca_version: 0.26.0
+
+# Hardware Architecture of the step-ca server
+# Can be any of :
+# amd64, 383, arm64, armv7, armv6, armv5
+step_ca_arch: armv7
+
+# URL to download binary tarball from
+step_ca_url: https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/step-ca_{{ step_ca_arch }}.deb

@@ -1,0 +1,4 @@
+---
+- name: restart step-ca
+  service: name=step-ca state=restarted
+  become: yes

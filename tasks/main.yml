@@ -1,0 +1,4 @@
+---
+- import_tasks: step-ca.yml
+  tags:
+    - step-ca

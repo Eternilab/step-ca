@@ -1,0 +1,96 @@
+---
+### Installation
+- name: "Download version {{ step_ca_version }} tarball"
+  get_url:
+    url: "{{ step_ca_url }}"
+    dest: "{{ step_ca_tmp_dir }}"
+  environment: "{{ proxy_env }}"
+  check_mode: no
+  # when: step_ca_version != "absent" and not srcpresent.stat.exists
+  tags:
+    - install
+
+- name: "step_ca : Extract tarball to {{ step_ca_tmp_dir }}/{{ step_ca_tarball }}"
+  unarchive:
+    src: "{{ step_ca_tmp_dir }}/{{ step_ca_tarball }}"
+    dest: "{{ step_ca_tmp_dir }}/"
+    remote_src: True
+    keep_newer: True
+  become: True
+  check_mode: no
+#  when: step_ca_version != "absent" and not srcpresent.stat.exists
+  tags:
+    - install
+
+- name: "Be sure conf directories exist in {{ step_ca_root_dir }}"
+  ansible.builtin.file:
+    name: "{{ step_ca_root_dir }}/{{ item }}"
+    owner: root
+    group: "{{ root_group }}"
+    mode: 0750
+    recurse: yes
+    state: directory
+  with_items: "{{ step_ca_dirlist }}"
+  become: yes
+  # notify:
+  #   - restart step-ca
+  tags:
+    - conf
+
+### Configuration
+- name: "Be sure step-ca is configured"
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ step_ca_root_dir }}/{{ item }}"
+    owner: root
+    group: "{{ root_group }}"
+    mode: 0640
+  with_items: "{{ step_ca_filelist }}"
+  become: yes
+  # notify:
+  #   - restart step-ca
+  tags:
+    - conf
+
+# - name: Be sure step-ca Certificate Authority templates are configured
+#   ansible.builtin.copy:
+#     src: "{{ item }}"
+#     dest: "{{ step_ca_root_dir }}/{{ item }}"
+#     owner: root
+#     group: "{{ root_group }}"
+#     mode: 0640
+#     state: present
+#   with_items: "{{ step_ca_ca_templates }}"
+#   become: yes
+#   notify:
+#     - restart step-ca
+#   tags:
+#     - conf
+
+- name: "Be sure spool directory {{ step_ca_root_dir }}/templates/certs/x509 exists"
+  ansible.builtin.file:
+    name: "{{ step_ca_root_dir }}/templates/certs/x509"
+    owner: root
+    group: "{{ root_group }}"
+    mode: 0750
+    recurse: no
+    state: directory
+  become: yes
+  # notify:
+  #   - restart step-ca
+  tags:
+    - conf
+
+- name: Be sure step-ca templates are configured
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ step_ca_root_dir }}/{{ item }}"
+    owner: root
+    group: "{{ root_group }}"
+    mode: 0640
+  with_items: "{{ step_ca_ra_templates }}"
+  become: yes
+  # notify:
+  #   - restart step-ca
+  tags:
+    - conf
