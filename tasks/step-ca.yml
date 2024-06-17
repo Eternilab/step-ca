@@ -93,7 +93,7 @@
 - name: "Be sure step-ca is configured"
   ansible.builtin.template:
     src: "{{ item }}.j2"
-    dest: "{{ step_ca_root_dir }}/{{ item }}.j2"
+    dest: "{{ step_ca_root_dir }}/{{ item }}"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
     mode: '0600'
@@ -114,7 +114,7 @@
     variable_start_string: '@{'
     variable_end_string: '}@'
   with_items: "{{ step_ca_ca_templates }}"
-  become: yes
+  become: true
   when: inventory_hostname in groups['ca_servers']
   # notify:
   #   - "Restart step-ca"
@@ -124,7 +124,7 @@
 - name: "Be sure step-ca RA templates are configured"
   ansible.builtin.template:
     src: "{{ item }}.j2"
-    dest: "{{ step_ca_root_dir }}/{{ item }}.j2"
+    dest: "{{ step_ca_root_dir }}/{{ item }}"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
     mode: '0600'
