@@ -2,7 +2,7 @@
 dependencies: []
 
 galaxy_info:
-  role_name: step-ca
+  role_name: stepca
   namespace: eternilab
   author: "Sylvain Leroy <sylvain.leroy@eternilab.com>"
   description: Configuration de l'outil de déploiement de PKI de Small Step

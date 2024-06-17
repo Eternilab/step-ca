@@ -1,4 +1,11 @@
 ---
-- import_tasks: step-ca.yml
+# - name: "Handling YubyHSM in step-ca role"
+#   ansible.builtin.import_tasks: yubihsm.yml
+#   when: step_ca_yubihsm
+#   tags:
+#     - step-ca
+
+- name: "Handling step and step-ca role"
+  ansible.builtin.import_tasks: step-ca.yml
   tags:
     - step-ca

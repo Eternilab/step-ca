@@ -7,35 +7,35 @@
     "address": "{{ ansible_default_ipv4.address }}:{{ step_ca_server_listen_port }}",
     "insecureAddress": "",
     "dnsNames": [
-	"ca.unmondelibre.fr",
-	"ra.unmondelibre.fr"
+	"ca.{{ step_ca_domain }}",
+	"ra.{{ step_ca_domain }}"
     ],
     "logger": {
 	"format": "text"
     },
     "db": {
 	"type": "badgerv2",
-	"dataSource": "{{ step_ca_root_dir }}/db",
+	"dataSource": "{{ step_ca_root_dir }}/db_server",
 	"badgerFileLoadingMode": ""
     },
     "authority": {
 	"provisioners": [
 	    {
 		"type": "JWK",
-		"name": "admin@unmondelibre.fr",
+		"name": "{{ step_ca_email }}",
 		"key": {
 		    "use": "sig",
 		    "kty": "OKP",
-		    "kid": "KzMNWrXvWBWq8ilbFEZFddrk9sV0OwAK79IxR9A5Eqc",
+		    "kid": "TODO",
 		    "crv": "Ed25519",
 		    "alg": "EdDSA",
 		    "x": "QpBaMgq-liKM0bWuvRrhwebzaxDTgziSJxf9ryz5DDY"
 		},
-		"encryptedKey": "eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJjdHkiOiJqd2sranNvbiIsImVuYyI6IkEyNTZHQ00iLCJwMmMiOjEwMDAwMCwicDJzIjoiYlZCYjBxM2pjdHBwdUVEUVFiRlNpUSJ9.RikVH7JeeCSFvtjm1-hN_1eGyEJumbFXWn132wNMkSN6b0wT3kqy9A.Bk3xdXnqZN62PxPh.KdYVOKRrsfN8iLlNwSHchazBZb72DtN_0RmKRePB03W5Y1zUDX1x93aL1-BNP0e8PeG1aRaQoZEOO9BxES0corlEZl9CTX-e2dQet6fa9fSNVzS6P01oD-eQH3KvvSPHP_fGX_fMW_zNFfClzRwopMOnOPPSBgJ8a-sc5BZ-VrXcANUpkAMLSuU_GsWOc58hTJl5giaJcp4Xm0nFle2NpGYwcOJdn4b9aCRQT6eTTOb0NDwf-vpXqGauJSVp6GCQetuo9TUxuBxTwRRrKeev.ZOpXtXHWZcrOZcLmodTRsQ",
+		"encryptedKey": "TODO",
 		"claims": {
-		    "minTLSCertDuration": "24h",
-		    "maxTLSCertDuration": "2160h",
-		    "defaultTLSCertDuration": "2160h",
+		    "minTLSCertDuration": {{ step_ca_structure.SubCA.S1.minTLSCertDuration }},
+		    "maxTLSCertDuration": {{ step_ca_structure.SubCA.S1.maxTLSCertDuration }},
+		    "defaultTLSCertDuration": {{ step_ca_structure.SubCA.S1.defaultTLSCertDuration }},
 		    "disableRenewal": false,
 		    "enableSSHCA": false
 		},
@@ -50,9 +50,9 @@
 		"name": "acme",
 		"forceCN": true,
 		"claims": {
-		    "minTLSCertDuration": "1440h",
-		    "maxTLSCertDuration": "2160h",
-		    "defaultTLSCertDuration": "2160h",
+		    "minTLSCertDuration": {{ step_ca_structure.SubCA.S1.minTLSCertDuration }},
+		    "maxTLSCertDuration": {{ step_ca_structure.SubCA.S1.maxTLSCertDuration }},
+		    "defaultTLSCertDuration": {{ step_ca_structure.SubCA.S1.defaultTLSCertDuration }},
 		    "disableRenewal": false,
 		    "enableSSHCA": false
 		},
@@ -64,16 +64,16 @@
 	    }
 	],
 	"template": {
-	    "country": "FR",
-            "organization": "Un Monde Libre",
-	    "locality": "{{ location }}",
-	    "province": "{{ province }}"
+	    "country": "{{ step_ca_structure.SubCA.S1.country }}",
+            "organization": "{{ step_ca_structure.SubCA.S1.organisation }}",
+	    "locality": "{{ step_ca_structure.SubCA.S1.locality }}",
+	    "province": "{{ step_ca_structure.SubCA.S1.province }}"
 	},
 	"backdate": "1m0s"
     },
 {% elif 'ra_servers' in group_names %}
-  "address": "{{ ansible_default_ipv4.address }}:9100",
-  "dnsNames": ["ra.unmondelibre.fr"],
+  "address": "{{ ansible_default_ipv4.address }}:{{ step_ca_server_listen_port }}",
+  "dnsNames": ["ra.{{ step_ca_domain }}"],
   "db": {
     "type": "badgerV2",
     "dataSource": "{{ step_ca_root_dir }}/db"
@@ -83,11 +83,11 @@
   },
   "authority": {
     "type": "stepcas",
-    "certificateAuthority": "https://ca.unmondelibre.fr:9100",
-    "certificateAuthorityFingerprint": "3d2f1b1f27aaa0db39ee30bc6b22259d15bb5f301ae6bc7788439a6a7a6256d2",
+    "certificateAuthority": "https://ca.{{ step_ca_domain }}:{{ step_ca_server_listen_port }}",
+    "certificateAuthorityFingerprint": "TODO",
     "certificateIssuer": {
 	"type" : "jwk",
-	"provisioner": "admin@unmondelibre.fr",
+	"provisioner": "{{ step_ca_email }}",
 	"key": "{{ step_ca_root_dir }}/secrets/ra_key.pem"
     },
     "provisioners": [
@@ -96,9 +96,9 @@
 	    "name": "acme",
 	    "forceCN": true,
 	    "claims": {
-		"minTLSCertDuration": "1440h",
-		"maxTLSCertDuration": "2160h",
-		"defaultTLSCertDuration": "2160h",
+	        "minTLSCertDuration": {{ step_ca_structure.SubCA.S1.minTLSCertDuration }},
+		"maxTLSCertDuration": {{ step_ca_structure.SubCA.S1.maxTLSCertDuration }},
+		"defaultTLSCertDuration": {{ step_ca_structure.SubCA.S1.defaultTLSCertDuration }},
 		"disableRenewal": false,
 		"enableSSHCA": false
 	    },
@@ -110,10 +110,10 @@
 	}
     ],
     "template": {
-	"country": "FR",
-        "organization": "Un Monde Libre",
-	"locality": "{{ location }}",
-	"province": "{{ province }}"
+        "country": "{{ step_ca_structure.SubCA.S1.country }}",
+        "organization": "{{ step_ca_structure.SubCA.S1.organisation }}",
+	"locality": "{{ step_ca_structure.SubCA.S1.locality }}",
+	"province": "{{ step_ca_structure.SubCA.S1.province }}"
     },
     "backdate": "1m0s"
   },

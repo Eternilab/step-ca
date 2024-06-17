@@ -1,4 +1,6 @@
 ---
-- name: restart step-ca
-  service: name=step-ca state=restarted
-  become: yes
+- name: "Restart step-ca"
+  ansible.builtin.service:
+    name: step-ca
+    state: restarted
+  become: true

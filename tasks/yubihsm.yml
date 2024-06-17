@@ -1,0 +1,12 @@
+---
+### Installation
+- name: "Download version {{ step_ca_version }} tarball"
+  ansible.builtin.get_url:
+    url: "{{ step_ca_url }}"
+    dest: "{{ step_ca_tmp_dir }}"
+    mode: '0644'
+  environment: "{{ proxy_env }}"
+  check_mode: false
+  # when: step_ca_version != "absent" and not srcpresent.stat.exists
+  tags:
+    - install

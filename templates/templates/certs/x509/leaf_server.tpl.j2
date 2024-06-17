@@ -1,0 +1,24 @@
+{
+{{ range .SANs }}
+  {{ if not (and (regexMatch ".*\\.@{ step_ca_fqdn | regex_replace('\.', '\\\\\.') }@" .Value) (eq .Type "dns")) }}
+    {{ fail "Not a *.@{ step_ca_fqdn }@ host" }}
+  {{ end }}
+{{ end }}
+    "subject": {
+        "commonName": {{ toJson .Subject.CommonName }}
+    },
+    "sans": {{ toJson .SANs }},
+{{- if typeIs "*rsa.PublicKey" .Insecure.CR.PublicKey }}
+    {{ if lt .Insecure.CR.PublicKey.Size @{ step_ca_structure.SubCA.S1.min_key_size_rsa }@ }}
+        {{ fail "Key length must be at least @{ step_ca_structure.SubCA.S1.min_key_size_rsa * 8 | int | abs }@ bits" }}
+    {{ end }}
+    "keyUsage": ["keyEncipherment", "digitalSignature"],
+{{- else }}
+    "keyUsage": ["digitalSignature"],
+{{- end }}
+    "extKeyUsage": ["@{ step_ca_structure.SubCA.S1.extKeyUsage }@"],
+    "basicConstraints": {
+        "isCA": false
+    },
+    "IssuingCertificateURL": ["http://@{ step_ca_fqdn }@/@{ step_ca_fqdn }@-S1-SubCA.der"]
+}

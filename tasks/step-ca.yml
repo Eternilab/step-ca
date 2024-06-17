@@ -1,39 +1,91 @@
 ---
+### Pre-Installation
+- name: "Create step group as a system group for daemon usage"
+  ansible.builtin.group:
+    name: "{{ step_ca_group }}"
+    state: present
+    system: true
+  become: true
+  tags:
+    - install
+
+- name: "Create step user as a system user for daemon usage"
+  ansible.builtin.user:
+    name: "{{ step_ca_user }}"
+    comment: "step and step-ca daemon account"
+    group: "{{ step_ca_group }}"
+    state: present
+    system: true
+  become: true
+  tags:
+    - install
+
 ### Installation
-- name: "Download version {{ step_ca_version }} tarball"
-  get_url:
-    url: "{{ step_ca_url }}"
-    dest: "{{ step_ca_tmp_dir }}"
-  environment: "{{ proxy_env }}"
-  check_mode: no
-  # when: step_ca_version != "absent" and not srcpresent.stat.exists
+- name: "Install dependancies for step-ca (APT based)"
+  ansible.builtin.apt:
+    pkg: "{{ step_ca_debian_dep }}"
+    state: latest
+    update_cache: yes
+  become: true
+  when: ansible_pkg_mgr == 'apt'
   tags:
     - install
 
-- name: "step_ca : Extract tarball to {{ step_ca_tmp_dir }}/{{ step_ca_tarball }}"
-  unarchive:
-    src: "{{ step_ca_tmp_dir }}/{{ step_ca_tarball }}"
-    dest: "{{ step_ca_tmp_dir }}/"
-    remote_src: True
-    keep_newer: True
-  become: True
-  check_mode: no
-#  when: step_ca_version != "absent" and not srcpresent.stat.exists
+- name: "Be sure that Debian backports are present"
+  ansible.builtin.apt_repository:
+    repo: "deb http://deb.debian.org/debian {{ ansible_distribution_release }}-backports main contrib non-free non-free-firmware"
+    state: present
+  become: true
+  when: ansible_pkg_mgr == 'apt'
   tags:
     - install
 
+- name: "Install golang from backports"
+  ansible.builtin.apt:
+    name: "{{ step_ca_debian_dep_backports }}"
+    state: latest
+    default_release: bookworm-backports
+    update_cache: yes
+  become: true
+  when: ansible_pkg_mgr == 'apt'
+  tags:
+    - install
+
+- name: "Compile and install using source tarball from Small Steps adding PKCS#11 support"
+  ansible.builtin.import_tasks: manual.yml
+  when: step_ca_install_mode == 'manual'
+
+- name: "Install using binary tarball from Small Steps"
+  ansible.builtin.import_tasks: binary.yml
+  when: step_ca_install_mode == 'binary'
+
+- name: "Install from Debian packages from Small Steps"
+  ansible.builtin.import_tasks: debian.yml
+  when: step_ca_install_debian == 'debian'
+
+### Pre-Configuration
 - name: "Be sure conf directories exist in {{ step_ca_root_dir }}"
   ansible.builtin.file:
     name: "{{ step_ca_root_dir }}/{{ item }}"
-    owner: root
-    group: "{{ root_group }}"
-    mode: 0750
-    recurse: yes
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_group }}"
+    mode: '0700'
+    recurse: false
     state: directory
-  with_items: "{{ step_ca_dirlist }}"
-  become: yes
-  # notify:
-  #   - restart step-ca
+  loop: "{{ step_ca_dirlist }}"
+  become: true
+  tags:
+    - conf
+
+- name: "Be sure spool directory {{ step_ca_root_dir }}/templates/certs/x509 exists"
+  ansible.builtin.file:
+    name: "{{ step_ca_root_dir }}/templates/certs/x509"
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_group }}"
+    mode: '0700'
+    recurse: false
+    state: directory
+  become: true
   tags:
     - conf
 
@@ -41,56 +93,47 @@
 - name: "Be sure step-ca is configured"
   ansible.builtin.template:
     src: "{{ item }}.j2"
-    dest: "{{ step_ca_root_dir }}/{{ item }}"
-    owner: root
-    group: "{{ root_group }}"
-    mode: 0640
+    dest: "{{ step_ca_root_dir }}/{{ item }}.j2"
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_group }}"
+    mode: '0600'
   with_items: "{{ step_ca_filelist }}"
-  become: yes
+  become: true
   # notify:
-  #   - restart step-ca
+  #   - "Restart step-ca"
   tags:
     - conf
 
-# - name: Be sure step-ca Certificate Authority templates are configured
-#   ansible.builtin.copy:
-#     src: "{{ item }}"
-#     dest: "{{ step_ca_root_dir }}/{{ item }}"
-#     owner: root
-#     group: "{{ root_group }}"
-#     mode: 0640
-#     state: present
-#   with_items: "{{ step_ca_ca_templates }}"
-#   become: yes
-#   notify:
-#     - restart step-ca
-#   tags:
-#     - conf
-
-- name: "Be sure spool directory {{ step_ca_root_dir }}/templates/certs/x509 exists"
-  ansible.builtin.file:
-    name: "{{ step_ca_root_dir }}/templates/certs/x509"
-    owner: root
-    group: "{{ root_group }}"
-    mode: 0750
-    recurse: no
-    state: directory
-  become: yes
-  # notify:
-  #   - restart step-ca
-  tags:
-    - conf
-
-- name: Be sure step-ca templates are configured
-  ansible.builtin.copy:
-    src: "{{ item }}"
+- name: "Be sure step-ca CA templates are configured"
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
     dest: "{{ step_ca_root_dir }}/{{ item }}"
-    owner: root
-    group: "{{ root_group }}"
-    mode: 0640
-  with_items: "{{ step_ca_ra_templates }}"
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_group }}"
+    mode: '0600'
+    variable_start_string: '@{'
+    variable_end_string: '}@'
+  with_items: "{{ step_ca_ca_templates }}"
   become: yes
+  when: inventory_hostname in groups['ca_servers']
   # notify:
-  #   - restart step-ca
+  #   - "Restart step-ca"
+  tags:
+    - conf
+
+- name: "Be sure step-ca RA templates are configured"
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ step_ca_root_dir }}/{{ item }}.j2"
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_group }}"
+    mode: '0600'
+    variable_start_string: '@{'
+    variable_end_string: '}@'
+  with_items: "{{ step_ca_ra_templates }}"
+  become: true
+  when: inventory_hostname in groups['ra_servers']
+  # notify:
+  #   - "Restart step-ca"
   tags:
     - conf

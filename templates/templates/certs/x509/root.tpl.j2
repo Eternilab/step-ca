@@ -1,0 +1,15 @@
+{
+    "subject": {
+	"country": "@{ step_ca_structure.rootCA.country }@",
+        "organization": "@{ step_ca_structure.rootCA.organisation }@",
+	"locality": "@{ step_ca_structure.rootCA.locality }@",
+	"province": "@{ step_ca_structure.rootCA.province }@",
+	"commonName": {{ toJson .Subject.CommonName }}
+    },
+    "issuer": {{ toJson .Subject }},
+    "keyUsage": ["certSign", "crlSign"],
+    "basicConstraints": {
+        "isCA": true,
+        "maxPathLen": 1
+    }
+}

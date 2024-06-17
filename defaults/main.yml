@@ -1,12 +1,165 @@
 ---
-step_ca_root_dir: /etc/step-ca
+# State is latest by default
+# step_ca_apt_state: latest
 
-step_ca_version: 0.26.0
+# Array of packages to install
+# step_ca_apt_packages:
+#   - step-ca
+
+step_ca_tmp_dir: /tmp
+
+step_ca_version: 0.26.1
 
 # Hardware Architecture of the step-ca server
 # Can be any of :
 # amd64, 383, arm64, armv7, armv6, armv5
-step_ca_arch: armv7
+step_ca_arch: amd64
+
+# How to install step-ca
+# Can be any of :
+# manual, binary, debian
+step_ca_install_mode: manual
+
+# User and group for step daemon
+step_ca_user: step
+step_ca_group: step
+
+# Install files targets
+step_ca_bin_file: /usr/local/bin/step-ca
+step_ca_svc_file: /lib/systemd/system/step-ca.service
+step_ca_pid_file: /run/step_ca.pid
+
+# Debian dependancies
+step_ca_debian_dep:
+  - make
+  - gcc
+  - ack
+  - libpcsclite-dev
+  - pkg-config
+
+step_ca_debian_dep_backports:
+  - golang
+
+#####
+### Manual installation
+#####
+
+step_ca_tarball_manual: step-ca_linux_{{ step_ca_version }}.tar.gz
+
+# URL to download source tarball from
+step_ca_url_manual: https://github.com/smallstep/certificates/archive/refs/tags/v{{ step_ca_version }}.tar.gz
+
+#####
+### Binary installation
+#####
+
+step_ca_tarball_binary: step-ca_linux_{{ step_ca_version }}_{{ step_ca_arch }}.tar.gz
 
 # URL to download binary tarball from
-step_ca_url: https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/step-ca_{{ step_ca_arch }}.deb
+step_ca_url_binary: https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/{{ step_ca_tarball }}
+
+#####
+### Debian installation
+#####
+
+# URL to download Debian pakage from
+step_ca_url_deb: https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/step-ca_{{ step_ca_arch }}.deb
+
+#####
+### Default user variables
+#####
+
+step_ca_server_listen_port: 9100
+step_ca_client_listen_port: 9101
+
+# ./bin/step-ca /home/oline/.step/config/ca_server.json --password-file /home/oline/.step/secrets/s1_ca_password.txt
+step_ca_filelist:
+  - config/ca_client.json
+  - config/ca_server.json
+
+step_ca_ca_templates:
+  - templates/certs/x509/root.tpl
+  - templates/certs/x509/intermediate_client.tpl
+  - templates/certs/x509/intermediate_server.tpl
+
+step_ca_ra_templates:
+  - templates/certs/x509/leaf_client.tpl
+  - templates/certs/x509/leaf_server.tpl
+
+step_ca_dirlist:
+  - certs
+  - config
+  - db_server
+  - db_client
+  - secrets
+  - templates
+
+
+# This will use a YubiHSM to store the intermediate CAs, otherwise it'll be stored on disk.
+# true  -> YubiHSM
+# false -> Store on disk
+step_ca_yubihsm: true
+
+step_ca_root_dir: /etc/step-ca
+
+# Proxy handling
+# You can set this variable to be able to go out
+# to the internet :
+#
+# proxy_env:
+#   http_proxy: http://proxy.example.com:3128
+#   https_proxy: http://proxy.example.com:3128
+#   ftp_proxy: http://proxy.example.com:3128
+
+# FQDN where to get the public certificates from
+step_ca_fqdn: "www.example.com"
+
+step_ca_suffix: "example.com-CA.crt"
+
+# Technical contact
+step_ca_email: "admin@example.com"
+
+# Domain name to sign certificates for
+# Used in templating for leaf certificates
+step_ca_domain: "example.com"
+
+step_ca_structure:
+  rootCA:
+    is_root: true
+    dnsnames:
+      - ca.example.com
+    organisation: "Ma Societe"
+    locality: "Paris"
+    province: "IDF"
+    country: "FR"
+  SubCA:
+    S1:
+      is_root: false
+      dnsnames:
+        - ca.example.com
+      organisation: "Ma Societe"
+      locality: "Paris"
+      province: "IDF"
+      country: "FR"
+      minTLSCertDuration: "1440h"
+      maxTLSCertDuration: "2160h"
+      defaultTLSCertDuration: "2160h"
+      # match: ".*\\.example\\.com"
+      min_key_size_rsa: 512
+      extKeyUsage: serverAuth
+      IssuingCertificateURL: "http://@{ step_ca_fqdn }@/@{ step_ca_domain }@-S1-SubCA.der"
+    C1:
+      is_root: false
+      dnsnames:
+        - ca.example.com
+      organisation: "Ma Societe"
+      locality: "Paris"
+      province: "IDF"
+      country: "FR"
+      minTLSCertDuration: "1440h"
+      maxTLSCertDuration: "2160h"
+      defaultTLSCertDuration: "2160h"
+      # match: ".*\\.example\\.com"
+      min_key_size_rsa: 512
+      extKeyUsage: clientAuth
+      IssuingCertificateURL: "http://@{ step_ca_fqdn }@/@{ step_ca_domain }@-C1-SubCA.der"

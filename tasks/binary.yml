@@ -1,0 +1,77 @@
+---
+- name: "Download step-ca tarball version {{ step_ca_version }}"
+  ansible.builtin.get_url:
+    url: "{{ step_ca_url_binary }}"
+    dest: "{{ step_ca_tmp_dir }}"
+    mode: '0640'
+    validate_certs: true
+  environment: "{{ proxy_env }}"
+  # when: step_ca_version != "absent" and not srcpresent.stat.exists
+  tags:
+    - install
+
+- name: "Download step-ca tarball signature for version version {{ step_ca_version }}"
+  ansible.builtin.get_url:
+    url: "{{ step_ca_url_binary }}.sig"
+    dest: "{{ step_ca_tmp_dir }}"
+    mode: '0640'
+    validate_certs: true
+  environment: "{{ proxy_env }}"
+  # when: step_ca_version != "absent" and not srcpresent.stat.exists
+  tags:
+    - install
+
+# - name: "Verify signature of step-ca tarball"
+#   community.crypto.openssl_signature_info:
+#     certificate_path: cert.pem
+#     path: "{{ step_ca_tmp_dir }}/{{ step_ca_tarball_binary }}"
+#     signature: "{{ step_ca_tmp_dir }}/{{ step_ca_tarball_binary }}.sig"
+#   register: verify
+#   ignore_errors: "{{ ansible_check_mode }}"
+#   tags:
+#     - install
+
+# - name: "Make sure the tarball signature is valid"
+#   ansible.builtin.assert:
+#     that:
+#       - verify.valid
+#   ignore_errors: "{{ ansible_check_mode }}"
+#   tags:
+#     - install
+
+- name: "Extract tarball to directory {{ step_ca_tmp_dir }}"
+  ansible.builtin.unarchive:
+    src: "{{ step_ca_tmp_dir }}/{{ step_ca_tarball_binary }}"
+    dest: "{{ step_ca_tmp_dir }}/"
+    remote_src: true
+    keep_newer: true
+#  when: step_ca_version != "absent" and not srcpresent.stat.exists
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags:
+    - install
+
+- name: "Install step-ca binary to /usr/local/bin"
+  ansible.builtin.copy:
+    src: "{{ step_ca_tmp_dir }}/step-ca"
+    dest: "/usr/local/bin/"
+    # owner: "{{ step_ca_user }}"
+    # group: "{{ step_ca_group }}"
+    mode: '0500'
+    remote_src: true
+  become: true
+  ignore_errors: "{{ ansible_check_mode }}"
+  tags:
+    - install
+
+- name: "Remove unused files from tarball extraction"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ step_ca_tmp_dir }}/{{ step_ca_tarball_binary }}"
+    - "{{ step_ca_tmp_dir }}/{{ step_ca_tarball_binary }}.sig"
+    - "{{ step_ca_tmp_dir }}/step-ca"
+    - "{{ step_ca_tmp_dir }}/README.md"
+    - "{{ step_ca_tmp_dir }}/LICENSE"
+  tags:
+    - install
