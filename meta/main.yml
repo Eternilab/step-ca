@@ -1,5 +1,9 @@
 ---
-dependencies: []
+dependencies:
+  - role: step-cli
+    when: inventory_hostname in groups['ca_servers']
+  - role: openssl
+    when: inventory_hostname in groups['va_servers']
 
 galaxy_info:
   role_name: stepca

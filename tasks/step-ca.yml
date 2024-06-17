@@ -27,7 +27,7 @@
     state: latest
     update_cache: yes
   become: true
-  when: ansible_pkg_mgr == 'apt'
+  when: ansible_pkg_mgr == 'apt' and (inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers'])
   tags:
     - install
 
@@ -36,7 +36,7 @@
     repo: "deb http://deb.debian.org/debian {{ ansible_distribution_release }}-backports main contrib non-free non-free-firmware"
     state: present
   become: true
-  when: ansible_pkg_mgr == 'apt'
+  when: ansible_pkg_mgr == 'apt' and inventory_hostname in groups['ca_servers']
   tags:
     - install
 
@@ -47,13 +47,13 @@
     default_release: bookworm-backports
     update_cache: yes
   become: true
-  when: ansible_pkg_mgr == 'apt'
+  when: ansible_pkg_mgr == 'apt' and inventory_hostname in groups['ca_servers']
   tags:
     - install
 
 - name: "Compile and install using source tarball from Small Steps adding PKCS#11 support"
   ansible.builtin.import_tasks: manual.yml
-  when: step_ca_install_mode == 'manual'
+  when: step_ca_install_mode == 'manual' and inventory_hostname in groups['ca_servers']
 
 - name: "Install using binary tarball from Small Steps"
   ansible.builtin.import_tasks: binary.yml
@@ -61,7 +61,7 @@
 
 - name: "Install from Debian packages from Small Steps"
   ansible.builtin.import_tasks: debian.yml
-  when: step_ca_install_debian == 'debian'
+  when: step_ca_install_debian == 'debian' or (step_ca_install_mode == 'manual' and inventory_hostname in groups['ra_servers'])
 
 ### Pre-Configuration
 - name: "Be sure conf directories exist in {{ step_ca_root_dir }}"
@@ -73,6 +73,7 @@
     recurse: false
     state: directory
   loop: "{{ step_ca_dirlist }}"
+  when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
   become: true
   tags:
     - conf
@@ -85,6 +86,7 @@
     mode: '0700'
     recurse: false
     state: directory
+  when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
   become: true
   tags:
     - conf
@@ -98,6 +100,7 @@
     group: "{{ step_ca_group }}"
     mode: '0600'
   with_items: "{{ step_ca_filelist }}"
+  when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
   become: true
   # notify:
   #   - "Restart step-ca"
