@@ -1,7 +1,7 @@
 ---
 dependencies:
   - role: step-cli
-    when: inventory_hostname in groups['ca_servers']
+    when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
   - role: openssl
     when: inventory_hostname in groups['va_servers']
 

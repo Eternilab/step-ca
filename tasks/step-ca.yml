@@ -61,7 +61,7 @@
 
 - name: "Install from Debian packages from Small Steps"
   ansible.builtin.import_tasks: debian.yml
-  when: step_ca_install_debian == 'debian' or (step_ca_install_mode == 'manual' and inventory_hostname in groups['ra_servers'])
+  when: step_ca_install_mode == 'debian' or (step_ca_install_mode == 'manual' and inventory_hostname in groups['ra_servers'])
 
 ### Pre-Configuration
 - name: "Be sure conf directories exist in {{ step_ca_root_dir }}"
@@ -112,6 +112,7 @@
     path: "{{ step_ca_systemd_svc_file }}"
     regexp: 'ca.json'
     replace: 'ca_servers.json'
+  become: true
   #when: ca_servers
 
 

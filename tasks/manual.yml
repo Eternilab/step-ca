@@ -6,6 +6,7 @@
     dest: "{{ step_ca_tmp_dir }}/{{ step_ca_tarball_manual }}"
     mode: '0640'
     validate_certs: true
+  check_mode: false
   environment: "{{ proxy_env }}"
   # when: step_ca_version != "absent" and not srcpresent.stat.exists
   tags:
@@ -53,7 +54,7 @@
   tags:
     - install
 
-- name: "Copy step-ca systemd service file to {{ step_ca_svc_file }}"
+- name: "Copy step-ca systemd service file to {{ step_ca_systemd_svc_file }}"
   ansible.builtin.copy:
     src: "{{ step_ca_tmp_dir }}/certificates-{{ step_ca_version }}/systemd/step-ca.service"
     dest: "{{ step_ca_systemd_svc_file }}"
