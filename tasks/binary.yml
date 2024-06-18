@@ -57,9 +57,31 @@
     # owner: "{{ step_ca_user }}"
     # group: "{{ step_ca_group }}"
     mode: '0500'
+    # todo : check mode
     remote_src: true
   become: true
   ignore_errors: "{{ ansible_check_mode }}"
+  tags:
+    - install
+
+- name: "Download step-ca systemd service file"
+  ansible.builtin.get_url:
+    url: "{{ step_ca_url_systemd_svc_file }}"
+    dest: "{{ step_ca_tmp_dir }}/step-ca.service"
+  environment: "{{ proxy_env }}"
+  check_mode: false
+  tags:
+    - install
+
+- name: "Copy step-ca systemd service file to {{ step_ca_systemd_svc_file }}"
+  ansible.builtin.copy:
+    src: "{{ step_ca_tmp_dir }}/step-ca.service"
+    dest: "{{ step_ca_systemd_svc_file }}"
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_group }}"
+    mode: '0644'
+    remote_src: true
+  become: true
   tags:
     - install
 

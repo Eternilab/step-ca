@@ -107,6 +107,14 @@
   tags:
     - conf
 
+- name: "Update systemd service file in order to use correct conf file (ca_servers.json)"
+  ansible.builtin.replace:
+    path: "{{ step_ca_systemd_svc_file }}"
+    regexp: 'ca.json'
+    replace: 'ca_servers.json'
+  #when: ca_servers
+
+
 - name: "Be sure step-ca CA templates are configured"
   ansible.builtin.template:
     src: "{{ item }}.j2"

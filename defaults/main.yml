@@ -26,7 +26,7 @@ step_ca_group: step
 
 # Install files targets
 step_ca_bin_file: /usr/local/bin/step-ca
-step_ca_svc_file: /etc/systemd/system/step-ca.service
+step_ca_systemd_svc_file: /etc/systemd/system/step-ca.service
 step_ca_pid_file: /run/step_ca.pid
 
 # Debian dependancies
@@ -65,7 +65,9 @@ step_ca_url_binary: https://github.com/smallstep/certificates/releases/download/
 # URL to download Debian pakage from
 step_ca_url_deb: https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/step-ca_{{ step_ca_arch }}.deb
 
-stepca_apt_state: present
+step_ca_url_systemd_svc_file: https://raw.githubusercontent.com/smallstep/certificates/v{{ step_ca_version }}/systemd/step-ca.service
+
+step_ca_apt_state: present
 
 #####
 ### Default user variables
