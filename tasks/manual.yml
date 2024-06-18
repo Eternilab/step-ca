@@ -47,7 +47,7 @@
     dest: "{{ step_ca_bin_file }}"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
-    mode: '0644'
+    mode: '0755'
     remote_src: true
   become: true
 
