@@ -1,4 +1,8 @@
 ---
+- name: Systemd daemon-reload
+  ansible.builtin.systemd:
+    daemon_reload: true
+  become: true
 - name: "Restart step-ca"
   ansible.builtin.service:
     name: step-ca

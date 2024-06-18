@@ -92,6 +92,7 @@
     - conf
 
 ### Configuration
+
 - name: "Be sure step-ca is configured"
   ansible.builtin.template:
     src: "{{ item }}.j2"
@@ -107,14 +108,16 @@
   tags:
     - conf
 
-- name: "Update systemd service file in order to use correct conf file (ca_servers.json)"
+- name: "Update systemd service file in order to use correct conf file (ca_server.json)"
   ansible.builtin.replace:
     path: "{{ step_ca_systemd_svc_file }}"
     regexp: 'ca.json'
-    replace: 'ca_servers.json'
+    replace: 'ca_server.json'
+  when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
   become: true
+  notify:
+    - Systemd daemon-reload
   #when: ca_servers
-
 
 - name: "Be sure step-ca CA templates are configured"
   ansible.builtin.template:

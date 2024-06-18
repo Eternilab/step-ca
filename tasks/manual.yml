@@ -63,8 +63,19 @@
     mode: '0644'
     remote_src: true
   become: true
+  notify:
+    - Systemd daemon-reload
   tags:
     - install
+
+- name: "Update systemd service file in order to use correct binary path ({{ step_ca_bin_file }})"
+  ansible.builtin.replace:
+    path: "{{ step_ca_systemd_svc_file }}"
+    regexp: '/usr/bin/step-ca'
+    replace: "{{ step_ca_bin_file }}"
+  become: true
+  notify:
+    - Systemd daemon-reload
 
 ### Cleaning install files
 - name: "Clean tarball in {{ step_ca_tmp_dir }}"

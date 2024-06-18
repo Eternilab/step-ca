@@ -37,6 +37,16 @@
     mode: '0644'
     remote_src: true
   become: true
+  notify:
+    - Systemd daemon-reload
+  tags:
+    - install
+
+### Cleaning install files
+- name: "Clean temporary systemd service file in {{ step_ca_tmp_dir }}"
+  ansible.builtin.file:
+    name: "{{ step_ca_tmp_dir }}/step-ca.service"
+    state: absent
   tags:
     - install
 
