@@ -1,4 +1,13 @@
 ---
+### Gather facts
+- name: "Gathering facts : already installed ?"
+  ansible.builtin.stat:
+    path: "{{ step_ca_bin_file }}"
+  check_mode: false
+  register: installed
+  tags:
+    - install
+
 ### Prepare
 - name: "Download step-ca source tarball version {{ step_ca_version }}"
   ansible.builtin.get_url:
@@ -9,6 +18,7 @@
   check_mode: false
   environment: "{{ proxy_env }}"
   # when: step_ca_version != "absent" and not srcpresent.stat.exists
+  when: not installed.stat.exists
   tags:
     - install
 
@@ -19,6 +29,7 @@
     remote_src: true
     keep_newer: true
 #  when: step_ca_version != "absent" and not srcpresent.stat.exists
+  when: not installed.stat.exists
   ignore_errors: "{{ ansible_check_mode }}"
   tags:
     - install
@@ -31,6 +42,7 @@
   ansible.builtin.shell:
     cmd: make bootstrap
     chdir: "{{ step_ca_tmp_dir }}/certificates-{{ step_ca_version }}"
+  when: not installed.stat.exists
   tags:
     - install
 
@@ -38,6 +50,7 @@
   ansible.builtin.shell:
     cmd: make build GO_ENVS="CGO_ENABLED=1"
     chdir: "{{ step_ca_tmp_dir }}/certificates-{{ step_ca_version }}"
+  when: not installed.stat.exists
   tags:
     - install
 
@@ -50,6 +63,7 @@
     group: "{{ step_ca_group }}"
     mode: '0755'
     remote_src: true
+  when: not installed.stat.exists
   become: true
   tags:
     - install
@@ -62,6 +76,7 @@
     group: "{{ step_ca_group }}"
     mode: '0644'
     remote_src: true
+  when: not installed.stat.exists
   become: true
   notify:
     - Systemd daemon-reload
@@ -73,6 +88,7 @@
     path: "{{ step_ca_systemd_svc_file }}"
     regexp: '/usr/bin/step-ca'
     replace: "{{ step_ca_bin_file }}"
+  when: not installed.stat.exists
   become: true
   notify:
     - Systemd daemon-reload
@@ -82,6 +98,7 @@
   ansible.builtin.file:
     name: "{{ step_ca_tmp_dir }}/{{ step_ca_tarball_manual }}"
     state: absent
+  when: not installed.stat.exists
   tags:
     - install
 

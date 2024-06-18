@@ -19,11 +19,18 @@
   tags:
     - install
 
+### Gather facts
+- name: "Gathering facts : Is step-ca service already present on the system"
+  ansible.builtin.service_facts:
+  tags:
+    - install
+
 - name: "Download step-ca systemd service file"
   ansible.builtin.get_url:
     url: "{{ step_ca_url_systemd_svc_file }}"
     dest: "{{ step_ca_tmp_dir }}/step-ca.service"
   environment: "{{ proxy_env }}"
+  when: "'step-ca.service' not in services"
   check_mode: false
   tags:
     - install
@@ -36,6 +43,7 @@
     group: "{{ step_ca_group }}"
     mode: '0644'
     remote_src: true
+  when: "'step-ca.service' not in services"
   become: true
   notify:
     - Systemd daemon-reload
@@ -47,6 +55,7 @@
   ansible.builtin.file:
     name: "{{ step_ca_tmp_dir }}/step-ca.service"
     state: absent
+  when: "'step-ca.service' not in services"
   tags:
     - install
 
