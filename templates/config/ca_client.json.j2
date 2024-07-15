@@ -30,35 +30,18 @@
 		    "alg": "EdDSA",
 		    "x": "QpBaMgq-liKM0bWuvRrhwebzaxDTgziSJxf9ryz5DDY"
 		},
-		"encryptedKey": "TODO",
+		"encryptedKey": "FIXME",
 		"claims": {
-		    "minTLSCertDuration": {{ step_ca_structure.SubCA.C1.minTLSCertDuration }},
-		    "maxTLSCertDuration": {{ step_ca_structure.SubCA.C1.maxTLSCertDuration }},
-		    "defaultTLSCertDuration": {{ step_ca_structure.SubCA.C1.defaultTLSCertDuration }},
-		    "disableRenewal": false,
-		    "enableSSHCA": false
+                  "minTLSCertDuration": "{{ step_ca_structure.SubCA.C1.minTLSCertDuration }}",
+                  "maxTLSCertDuration": "{{ step_ca_structure.SubCA.C1.maxTLSCertDuration }}",
+                  "defaultTLSCertDuration": "{{ step_ca_structure.SubCA.C1.defaultTLSCertDuration }}",
+                  "disableRenewal": false,
+                  "enableSSHCA": false
 		},
 		"options": {
-                    "x509": {
-                        "templateFile": "{{ step_ca_root_dir }}/templates/certs/x509/leaf_client.tpl"
-                    }
-                }
-	    },
-	    {
-		"type": "ACME",
-		"name": "acme",
-		"forceCN": true,
-		"claims": {
-		    "minTLSCertDuration": {{ step_ca_structure.SubCA.C1.minTLSCertDuration }},
-		    "maxTLSCertDuration": {{ step_ca_structure.SubCA.C1.maxTLSCertDuration }},
-		    "defaultTLSCertDuration": {{ step_ca_structure.SubCA.C1.defaultTLSCertDuration }},
-		    "disableRenewal": false,
-		    "enableSSHCA": false
-		},
-		"options": {
-                    "x509": {
-                        "templateFile": "{{ step_ca_root_dir }}/templates/certs/x509/leaf_client.tpl"
-                    }
+                  "x509": {
+                    "templateFile": "{{ step_ca_root_dir }}/templates/certs/x509/leaf_client.tpl"
+                  }
                 }
 	    }
 	],
@@ -83,7 +66,7 @@
   "authority": {
     "type": "stepcas",
     "certificateAuthority": "https://ca.{{ step_ca_domain }}:{{ step_ca_client_listen_port }}",
-    "certificateAuthorityFingerprint": "TODO",
+    "certificateAuthorityFingerprint": "FIXME",
     "certificateIssuer": {
 	"type" : "jwk",
 	"provisioner": "{{ step_ca_email }}",
@@ -95,9 +78,9 @@
 	    "name": "acme",
 	    "forceCN": true,
 	    "claims": {
-	        "minTLSCertDuration": {{ step_ca_structure.SubCA.C1.minTLSCertDuration }},
-		"maxTLSCertDuration": {{ step_ca_structure.SubCA.C1.maxTLSCertDuration }},
-		"defaultTLSCertDuration": {{ step_ca_structure.SubCA.C1.defaultTLSCertDuration }},
+	        "minTLSCertDuration": "{{ step_ca_structure.SubCA.C1.minTLSCertDuration }}",
+		"maxTLSCertDuration": "{{ step_ca_structure.SubCA.C1.maxTLSCertDuration }}",
+		"defaultTLSCertDuration": "{{ step_ca_structure.SubCA.C1.defaultTLSCertDuration }}",
 		"disableRenewal": false,
 		"enableSSHCA": false
 	    },
