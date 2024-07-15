@@ -1,7 +1,7 @@
 {
 {{ range .SANs }}
-  {{ if not (and (regexMatch ".*\\.@{ step_ca_fqdn | regex_replace('\.', '\\\\\.') }@" .Value) (eq .Type "dns")) }}
-    {{ fail "Not a *.@{ step_ca_fqdn }@ host" }}
+  {{ if not (and (regexMatch ".*\\.@{ step_ca_domain | regex_replace('\.', '\\\\\.') }@" .Value) (eq .Type "dns")) }}
+    {{ fail "Not a *.@{ step_ca_domain }@ host" }}
   {{ end }}
 {{ end }}
     "subject": {
@@ -20,5 +20,5 @@
     "basicConstraints": {
         "isCA": false
     },
-    "IssuingCertificateURL": ["http://@{ step_ca_fqdn }@/@{ step_ca_fqdn }@-C1-SubCA.der"]
+    "IssuingCertificateURL": ["@{ step_ca_structure.SubCA.S1.IssuingCertificateURL }@"]
 }
