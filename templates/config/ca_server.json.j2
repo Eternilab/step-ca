@@ -5,7 +5,7 @@
     "crt": "{{ step_ca_root_dir }}/certs/intermediate_ca_server.crt",
     "key": "{{ step_ca_root_dir }}/secrets/intermediate_ca_server_key",
     "address": "{{ ansible_default_ipv4.address }}:{{ step_ca_server_listen_port }}",
-    "insecureAddress": "",
+    "insecureAddress": "{{ ansible_default_ipv4.address }}:{{ step_ca_server_insecure_port }}",
     "dnsNames": [
       "ca.{{ step_ca_domain }}"
     ],
@@ -30,39 +30,35 @@
 		    "alg": "EdDSA",
 		    "x": "QpBaMgq-liKM0bWuvRrhwebzaxDTgziSJxf9ryz5DDY"
 		},
-		"encryptedKey": "FIXME",
+		"encryptedKey": "TODO",
                 "claims": {
-                  "minTLSCertDuration": "{{ step_ca_structure.SubCA.C1.minTLSCertDuration }}",
-                  "maxTLSCertDuration": "{{ step_ca_structure.SubCA.C1.maxTLSCertDuration }}",
-                  "defaultTLSCertDuration": "{{ step_ca_structure.SubCA.C1.defaultTLSCertDuration }}",
+                  "minTLSCertDuration": {{ step_ca_structure.SubCA.S1.minTLSCertDuration }},
+                  "maxTLSCertDuration": {{ step_ca_structure.SubCA.S1.maxTLSCertDuration }},
+                  "defaultTLSCertDuration": {{ step_ca_structure.SubCA.S1.defaultTLSCertDuration }},
                   "disableRenewal": false,
                   "enableSSHCA": false
 		},
 		"options": {
                   "x509": {
-                    "templateFile": "{{ step_ca_root_dir }}/templates/certs/x509/leaf_client.tpl"
+                    "templateFile": "{{ step_ca_root_dir }}/templates/certs/x509/leaf_server.tpl"
                   }
                 }
             },
-            {
-               "type": "ACME",
-               "name": "acme",
-               "forceCN": true,
-               "claims": {
-                   "minTLSCertDuration": "{{ step_ca_structure.SubCA.C1.minTLSCertDuration }}",
-                   "maxTLSCertDuration": "{{ step_ca_structure.SubCA.C1.maxTLSCertDuration }}",
-                   "defaultTLSCertDuration": "{{ step_ca_structure.SubCA.C1.defaultTLSCertDuration }}",
-                   "disableRenewal": false,
-                   "enableSSHCA": false
-               },
-               "options": {
-                    "x509": {
-                        "templateFile": "{{ step_ca_root_dir }}/templates/certs/x509/leaf_client.tpl"
-                    }
-                }
-
-	    }
 	],
+	"template": {
+	    "country": "{{ step_ca_structure.SubCA.S1.country }}",
+            "organization": "{{ step_ca_structure.SubCA.S1.organisation }}",
+	    "locality": "{{ step_ca_structure.SubCA.S1.locality }}",
+	    "province": "{{ step_ca_structure.SubCA.S1.province }}"
+	},
+	"backdate": "1m0s"
+    },
+    "crl": {
+        "enabled": true,
+        "generateOnRevoke": true,
+        "cacheDuration": "24h0m0s",
+        "idpURL": "{{ step_ca_structure.SubCA.S1.crlDistributionPoints }}"
+    },
 {% elif 'ra_servers' in group_names %}
   "address": "{{ ansible_default_ipv4.address }}:{{ step_ca_server_listen_port }}",
   "dnsNames": ["ra.{{ step_ca_domain }}"],

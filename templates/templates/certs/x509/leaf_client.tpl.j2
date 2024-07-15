@@ -20,5 +20,6 @@
     "basicConstraints": {
         "isCA": false
     },
-    "IssuingCertificateURL": ["@{ step_ca_structure.SubCA.S1.IssuingCertificateURL }@"]
+    "IssuingCertificateURL": ["@{ step_ca_structure.SubCA.S1.IssuingCertificateURL }@"],
+    "crlDistributionPoints": ["@{ step_ca_structure.SubCA.S1.crlDistributionPoints }@"]
 }
