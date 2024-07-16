@@ -116,11 +116,6 @@ proxy_env:
 #   https_proxy: http://proxy.example.com:3128
 #   ftp_proxy: http://proxy.example.com:3128
 
-# FQDN to get the public certificates from
-#step_ca_fqdn: "www.example.com"
-
-#step_ca_suffix: "example.com-CA.crt"
-
 # Technical contact
 #step_ca_email: "admin@example.com"
 
