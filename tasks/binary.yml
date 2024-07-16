@@ -81,6 +81,7 @@
   ansible.builtin.get_url:
     url: "{{ step_ca_url_systemd_svc_file }}"
     dest: "{{ step_ca_tmp_dir }}/step-ca.service"
+    mode: '0640'
   environment: "{{ proxy_env }}"
   when: not installed.stat.exists
   check_mode: false

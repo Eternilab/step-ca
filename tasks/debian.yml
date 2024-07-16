@@ -1,16 +1,17 @@
 ---
 ### Pre-Installation
-- name: "Download Debian package version {{ step_ca_version }} of step-ca"
+- name: "Download Debian package version {{ step_ca_version }} "
   ansible.builtin.get_url:
     url: "{{ step_ca_url_deb }}"
     dest: "{{ step_ca_tmp_dir }}/step-ca_{{ step_ca_version }}.deb"
+    mode: '0640'
   environment: "{{ proxy_env }}"
   check_mode: false
   tags:
     - install
 
 ### Installation
-- name: "Be sure step-ca version ({{ step_ca_version }}) is installed (APT based)"
+- name: "Be sure step-ca version is installed (APT based): ({{ step_ca_version }})"
   ansible.builtin.apt:
     deb: "{{ step_ca_tmp_dir }}/step-ca_{{ step_ca_version }}.deb"
     state: "{{ step_ca_apt_state }}"
@@ -29,6 +30,7 @@
   ansible.builtin.get_url:
     url: "{{ step_ca_url_systemd_svc_file }}"
     dest: "{{ step_ca_tmp_dir }}/step-ca.service"
+    mode: '0644'
   environment: "{{ proxy_env }}"
   when: "'step-ca.service' not in services"
   check_mode: false

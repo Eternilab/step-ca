@@ -1,6 +1,6 @@
 ---
 ### Installation
-- name: "Download version {{ step_ca_version }} tarball"
+- name: "Download tarball version {{ step_ca_version }}"
   ansible.builtin.get_url:
     url: "{{ step_ca_url }}"
     dest: "{{ step_ca_tmp_dir }}"

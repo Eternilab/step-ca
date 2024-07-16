@@ -36,21 +36,25 @@
 
 ### Build
 # https://github.com/smallstep/certificates/blob/master/CONTRIBUTING.md#build-step-ca-using-cgo
-#sudo apt install golang -t bookworm-backports
+# sudo apt install golang -t bookworm-backports
 
 - name: "Let's prepare build"
-  ansible.builtin.shell:
+  ansible.builtin.command:
     cmd: make bootstrap
     chdir: "{{ step_ca_tmp_dir }}/certificates-{{ step_ca_version }}"
   when: not installed.stat.exists
+  register: step_ca_make_bootstrap_output
+  changed_when: step_ca_make_bootstrap_output.rc != 0
   tags:
     - install
 
 - name: "Let's build"
-  ansible.builtin.shell:
+  ansible.builtin.command:
     cmd: make build GO_ENVS="CGO_ENABLED=1"
     chdir: "{{ step_ca_tmp_dir }}/certificates-{{ step_ca_version }}"
   when: not installed.stat.exists
+  register: step_ca_make_build_output
+  changed_when: step_ca_make_build_output.rc != 0
   tags:
     - install
 

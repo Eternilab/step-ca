@@ -24,8 +24,8 @@
 - name: "Install dependancies for step-ca (APT based)"
   ansible.builtin.apt:
     pkg: "{{ step_ca_debian_dep }}"
-    state: latest
-    update_cache: yes
+    state: present
+    update_cache: true
   become: true
   when: ansible_pkg_mgr == 'apt' and (inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers'])
   tags:
@@ -43,9 +43,9 @@
 - name: "Install golang from backports"
   ansible.builtin.apt:
     name: "{{ step_ca_debian_dep_backports }}"
-    state: latest
+    state: present
     default_release: bookworm-backports
-    update_cache: yes
+    update_cache: true
   become: true
   when: ansible_pkg_mgr == 'apt' and inventory_hostname in groups['ca_servers']
   tags:
@@ -78,7 +78,7 @@
   tags:
     - conf
 
-- name: "Be sure spool directory {{ step_ca_root_dir }}/templates/certs/x509 exists"
+- name: "Be sure spool directory exists"
   ansible.builtin.file:
     name: "{{ step_ca_root_dir }}/templates/certs/x509"
     owner: "{{ step_ca_user }}"
@@ -117,7 +117,7 @@
   become: true
   notify:
     - Systemd daemon-reload
-  #when: ca_servers
+  # when: ca_servers
 
 - name: "Be sure step-ca CA templates are configured"
   ansible.builtin.template:

@@ -117,11 +117,11 @@ proxy_env:
 #   ftp_proxy: http://proxy.example.com:3128
 
 # Technical contact
-#step_ca_email: "admin@example.com"
+# step_ca_email: "admin@example.com"
 
 # Domain name to sign certificates for
 # Used in templating for leaf certificates
-#step_ca_domain: "example.com"
+# step_ca_domain: "example.com"
 
 step_ca_structure:
   rootCA:
