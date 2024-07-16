@@ -31,7 +31,7 @@
   tags:
     - install
 
-- name: "Be sure that Debian backports are present"
+- name: "Be sure that Debian backports are present for source build"
   ansible.builtin.apt_repository:
     repo: "deb http://deb.debian.org/debian {{ ansible_distribution_release }}-backports main contrib non-free non-free-firmware"
     state: present
@@ -40,7 +40,7 @@
   tags:
     - install
 
-- name: "Install golang from backports"
+- name: "Install golang from backports for source build"
   ansible.builtin.apt:
     name: "{{ step_ca_debian_dep_backports }}"
     state: present
@@ -91,8 +91,100 @@
   tags:
     - conf
 
-### Configuration
+###########################
+### Configuration des clefs
 
+- name: "Check if CA public key/certificate exists"
+  ansible.builtin.stat:
+    # name: "{{ step_ca_root_dir }}/certs/root_ca.crt"
+    name: "{{ step_ca_root_dir }}/secrets/root_ca.crt"
+  register: ca_pub_key
+  when: inventory_hostname in groups['ca_servers']
+  become: true
+  tags:
+    - conf
+    - toto
+
+# - name: "Check if CA private key exists"
+#   ansible.builtin.file:
+#     name: "{{ step_ca_root_dir }}/secrets/root_ca.key"
+#     owner: "{{ step_ca_user }}"
+#     group: "{{ step_ca_group }}"
+#     # mode: '0600'
+#     recurse: false
+#     state: present
+#   register: ca_private_key
+#   when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key
+#   become: true
+#   tags:
+#     - conf
+
+- name: "Create password file for CA"
+  ansible.builtin.template:
+    src: "secrets/root_ca_password_file.j2"
+    dest: "{{ step_ca_root_dir }}/secrets/root_ca_password_file"
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_group }}"
+    mode: '0400'
+  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  become: true
+  # notify:
+  #   - "Restart step-ca"
+  tags:
+    - conf
+    - toto
+
+- name: "Create CA private and public keys"
+  ansible.builtin.command:
+    cmd: "step certificate create --template={{ step_ca_root_dir }}/templates/certs/x509/root.tpl --password-file {{ step_ca_root_dir }}/secrets/root_ca_password_file  --kty {{ step_ca_structure.rootCA.keytype }} --curve {{ step_ca_structure.rootCA.keycurve }} \"ca.{{ step_ca_domain }}\" {{ step_ca_root_dir }}/secrets/root_ca.crt {{ step_ca_root_dir }}/secrets/root_ca.key"
+#  register: my_ssh_public_key
+  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  become: true
+  changed_when: true
+  tags:
+    - conf
+    - toto
+
+- name: "Fix CA private key ownership and rights"
+  ansible.builtin.file:
+    name: "{{ step_ca_root_dir }}/secrets/root_ca.key"
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_group }}"
+    mode: '0400'
+    state: file
+  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  become: true
+  tags:
+    - conf
+    - toto
+
+- name: "Fix CA public key/certificate ownership and rights"
+  ansible.builtin.file:
+    name: "{{ step_ca_root_dir }}/secrets/root_ca.crt"
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_group }}"
+    mode: '0600'
+    state: file
+  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  become: true
+  tags:
+    - conf
+    - toto
+
+#step certificate create intermediate-ca intermediate-ca.crt intermediate-ca.key --profile intermediate-ca --ca ./root-ca.crt --ca-key ./root-ca.key
+
+- name: "Remove password file for CA as it won't be of any use"
+  ansible.builtin.file:
+    path: "{{ step_ca_root_dir }}/secrets/root_ca_password_file"
+    state: absent
+  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm
+  become: true
+  tags:
+    - conf
+    - toto
+
+#################
+### Configuration
 - name: "Be sure step-ca is configured"
   ansible.builtin.template:
     src: "{{ item }}.j2"

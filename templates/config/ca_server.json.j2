@@ -3,7 +3,7 @@
     "root": "{{ step_ca_root_dir }}/certs/root_ca.crt",
     "federatedRoots": null,
     "crt": "{{ step_ca_root_dir }}/certs/intermediate_ca_server.crt",
-    "key": "{{ step_ca_root_dir }}/secrets/intermediate_ca_server_key",
+    "key": "{{ step_ca_root_dir }}/secrets/intermediate_ca_server.key",
     "address": "{{ ansible_default_ipv4.address }}:{{ step_ca_server_listen_port }}",
     "insecureAddress": "{{ ansible_default_ipv4.address }}:{{ step_ca_server_insecure_port }}",
     "dnsNames": [

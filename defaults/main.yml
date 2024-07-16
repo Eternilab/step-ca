@@ -103,7 +103,7 @@ step_ca_dirlist:
 # This will use a YubiHSM to store the intermediate CAs, otherwise it'll be stored on disk.
 # true  -> YubiHSM
 # false -> Store on disk
-step_ca_yubihsm: true
+step_ca_yubihsm: false
 
 step_ca_root_dir: /etc/step-ca
 
@@ -132,6 +132,11 @@ step_ca_structure:
     locality: "Paris"
     province: "IDF"
     country: "FR"
+    # EC or OKP
+    keytype: EC
+    # EC: P-256, P-384, P-521
+    # OKP: Ed25519
+    keycurve: P-384
   SubCA:
     ocspFQDN: "ocsp.example.com"
     S1:
