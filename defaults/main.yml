@@ -29,7 +29,7 @@ step_ca_bin_file: /usr/local/bin/step-ca
 step_ca_systemd_svc_file: /etc/systemd/system/step-ca.service
 step_ca_pid_file: /run/step_ca.pid
 
-# Debian dependancies
+# Debian dependencies
 step_ca_debian_dep:
   - make
   - gcc
@@ -74,6 +74,7 @@ step_ca_apt_state: present
 #####
 
 step_ca_server_listen_port: 9100
+step_ca_server_insecure_port: 8080
 step_ca_client_listen_port: 9101
 
 # ./bin/step-ca /home/oline/.step/config/ca_server.json --password-file /home/oline/.step/secrets/s1_ca_password.txt
@@ -115,17 +116,17 @@ proxy_env:
 #   https_proxy: http://proxy.example.com:3128
 #   ftp_proxy: http://proxy.example.com:3128
 
-# FQDN where to get the public certificates from
-step_ca_fqdn: "www.example.com"
+# FQDN to get the public certificates from
+#step_ca_fqdn: "www.example.com"
 
-step_ca_suffix: "example.com-CA.crt"
+#step_ca_suffix: "example.com-CA.crt"
 
 # Technical contact
-step_ca_email: "admin@example.com"
+#step_ca_email: "admin@example.com"
 
 # Domain name to sign certificates for
 # Used in templating for leaf certificates
-step_ca_domain: "example.com"
+#step_ca_domain: "example.com"
 
 step_ca_structure:
   rootCA:
@@ -151,7 +152,7 @@ step_ca_structure:
       # match: ".*\\.example\\.com"
       min_key_size_rsa: 512
       extKeyUsage: serverAuth
-      IssuingCertificateURL: "http://@{ step_ca_fqdn }@/@{ step_ca_domain }@-S1-SubCA.der"
+      IssuingCertificateURL: "http://dist.example.com/example.com-S1-SubCA.der"
     C1:
       is_root: false
       dnsnames:
@@ -166,4 +167,5 @@ step_ca_structure:
       # match: ".*\\.example\\.com"
       min_key_size_rsa: 512
       extKeyUsage: clientAuth
-      IssuingCertificateURL: "http://@{ step_ca_fqdn }@/@{ step_ca_domain }@-C1-SubCA.der"
+      IssuingCertificateURL: "http://dist.example.com/example.com-C1-SubCA.der"
+      crlDistributionPoints: "http://crl.example.com/crl"
