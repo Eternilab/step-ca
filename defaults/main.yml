@@ -133,6 +133,7 @@ step_ca_structure:
     province: "IDF"
     country: "FR"
   SubCA:
+    ocspFQDN: "ocsp.example.com"
     S1:
       is_root: false
       dnsnames:
