@@ -92,7 +92,7 @@
     - conf
 
 ###########################
-### Configuration des clefs
+### Configuration des clefs racines et intermédiaires
 
 - name: "Check if CA public key/certificate exists"
   ansible.builtin.stat:

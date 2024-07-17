@@ -126,8 +126,6 @@ proxy_env:
 step_ca_structure:
   rootCA:
     is_root: true
-    dnsnames:
-      - ca.example.com
     organisation: "Ma Societe"
     locality: "Paris"
     province: "IDF"
@@ -141,8 +139,6 @@ step_ca_structure:
     ocspFQDN: "ocsp.example.com"
     S1:
       is_root: false
-      dnsnames:
-        - ca.example.com
       organisation: "Ma Societe"
       locality: "Paris"
       province: "IDF"
@@ -156,8 +152,6 @@ step_ca_structure:
       IssuingCertificateURL: "http://dist.example.com/example.com-S1-SubCA.der"
     C1:
       is_root: false
-      dnsnames:
-        - ca.example.com
       organisation: "Ma Societe"
       locality: "Paris"
       province: "IDF"
