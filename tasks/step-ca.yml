@@ -137,7 +137,6 @@
 - name: "Create CA private and public keys"
   ansible.builtin.command:
     cmd: "step certificate create --template={{ step_ca_root_dir }}/templates/certs/x509/root.tpl --password-file {{ step_ca_root_dir }}/secrets/root_ca_password_file  --kty {{ step_ca_structure.rootCA.keytype }} --curve {{ step_ca_structure.rootCA.keycurve }} \"ca.{{ step_ca_domain }}\" {{ step_ca_root_dir }}/secrets/root_ca.crt {{ step_ca_root_dir }}/secrets/root_ca.key"
-#  register: my_ssh_public_key
   when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
   become: true
   changed_when: true
@@ -171,7 +170,7 @@
     - conf
     - toto
 
-#step certificate create intermediate-ca intermediate-ca.crt intermediate-ca.key --profile intermediate-ca --ca ./root-ca.crt --ca-key ./root-ca.key
+# step certificate create intermediate-ca intermediate-ca.crt intermediate-ca.key --profile intermediate-ca --ca ./root-ca.crt --ca-key ./root-ca.key
 
 - name: "Remove password file for CA as it won't be of any use"
   ansible.builtin.file:
