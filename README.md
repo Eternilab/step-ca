@@ -88,43 +88,98 @@ Gestion des DNS
 ---------------
 
 FQDN de la CA, sur laquelle tourne un step-ca en mode StepCAS CA qui a la capacité de signer avec l'identité de la SubCA (fichier ou HSM)
-- ca.example.com
+
+```
+ca.example.com
+```
 
 FQDN de la RA, sur laquelle tourne un step-ca en mode StepCAS RA qui fournit un service de renouvellement ACME.
-- ra.example.com
+
+```
+ra.example.com
+```
 
 FQDN du serveur OCSP OpenSSL, accessible uniquement par les reverse proxies frontaux.
-- va.example.com
+
+```
+va.example.com
+```
 
 FQDN du reverse proxy frontal, exposé publiquement pour fournir le service OCSP (Authority Information Access - OCSP).
-- ocsp.example.com
+
+```
+ocsp.example.com
+```
 
 FQDN du reverse proxy frontal, exposé publiquement pour distribuer la CRL (CRL Distribution Points - FullName).
-- crl.example.com
+
+```
+crl.example.com
+```
 
 FQDN du reverse proxy frontal, exposé publiquement pour distribuer des certificats racines et intermédiaires (Authority Information Access - CA Issuers).
-- dist.example.com
+
+```
+dist.example.com
+```
+
+
+Révocation de certificats
+-------------------------
+
+Pour révoquer un certificat, nous pouvons utiliser la commande "step ca revoke" (attention, pas "step-ca" mais bien "step ca") :
+
+```
+step ca revoke --reason "Raison de la revocation" --reasonCode "4" XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+```
+
+en remplaçant les X par la fingerprint du certificat.
+Nous devons alors authentifier la demande avec le mot de passe de la clé privée l'ayant signé.
+
+
+Il est aussi possible de révoquer un certificat avec son fichier et sa clé privée, auquel cas aucun mot de passe n'est demandé.
+
+```
+step ca revoke --reason "Raison de la revocation" --reasonCode "4" --cert exemplecertificat.crt --key exemplecle.key
+```
+
+Il est important de justifier chaque révocation avec le paramètre ```--reasonCode``` (voir la [documentation](https://smallstep.com/docs/step-cli/reference/ca/revoke/#options)).
+Nous utiliserons le plus souvent le reasonCode 4 ("superseded" - "remplacé") avec une description plus claire de la raison exacte dans le paramètre ```--reason```.
 
 
 Dépendances
 -----------
 
-roles:
-  step-cli
-  openssl
+rôles:
+<ul>
+  <li>step-cli</li>
+  <li>openssl</li>
+</ul>
+
+Le rôle openssl ne sert qu'à s'assurer de la présence du binaire OpenSSL sur la machine. Si un rôle relatif à openssl et son binaire sont déjà présents, celui-ci n'est pas nécessaire.
 
 
-Exemple de playbook
--------------------
+Exemple de playbook intégrant ce rôle
+-------------------------------------
 
 ````{verbatim}
 ### PKI/IGC
 - hosts:
     - ca_servers
     - ra_servers
-    - va_servers
   roles:
     - step-ca
+  tags:
+    - igc
+    - pki
+- hosts:
+    - va_servers
+  roles:
+    - openssl
+    - nginx
+  tags:
+    - igc
+    - pki
 ````
 
 Configuration Reverse Proxy
