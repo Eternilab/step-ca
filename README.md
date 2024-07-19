@@ -87,41 +87,53 @@ La variable "step_ca_structure" définit la structure de l'IGC. Chacune de ses v
 Gestion des DNS
 ---------------
 
-FQDN de la CA, sur laquelle tourne un step-ca en mode StepCAS CA qui a la capacité de signer avec l'identité de la SubCA (fichier ou HSM)
+<ul>
+<li>FQDN de la CA, sur laquelle tourne un step-ca en mode StepCAS CA qui a la capacité de signer avec l'identité de la SubCA (fichier ou HSM) :
 
 ```
 ca.example.com
 ```
+</li>
 
-FQDN de la RA, sur laquelle tourne un step-ca en mode StepCAS RA qui fournit un service de renouvellement ACME.
+<li>FQDN de la RA, sur laquelle tourne un step-ca en mode StepCAS RA qui fournit un service de renouvellement ACME :
 
 ```
 ra.example.com
 ```
+</li>
 
-FQDN du serveur OCSP OpenSSL, accessible uniquement par les reverse proxies frontaux.
+<li>FQDN du serveur OCSP OpenSSL, accessible uniquement par les reverse proxies frontaux :
 
 ```
 va.example.com
 ```
+</li>
 
-FQDN du reverse proxy frontal, exposé publiquement pour fournir le service OCSP (Authority Information Access - OCSP).
+<li>FQDN du reverse proxy frontal, exposé publiquement pour fournir le service OCSP (Authority Information Access - OCSP) :
 
 ```
 ocsp.example.com
 ```
+</li>
 
-FQDN du reverse proxy frontal, exposé publiquement pour distribuer la CRL (CRL Distribution Points - FullName).
+<li>FQDN du reverse proxy frontal, exposé publiquement pour distribuer la CRL (CRL Distribution Points - FullName) :
 
 ```
 crl.example.com
 ```
+Il faudra configurer le reverse proxy pour que les connexions aux URL valides et elles seulement soient transférées du FQDN de ce reverse proxy à l'URL de la CA qui délivrera la CRL, en liste blanche.
+Les deux seules URL valides sont ```/crl``` et ```/1.0/crl```.
+Pour l'exemple du FQDN ci-dessus, ```crl.example.com/crl``` et ```crl.example.com/1.0/crl```.
+</li>
 
-FQDN du reverse proxy frontal, exposé publiquement pour distribuer des certificats racines et intermédiaires (Authority Information Access - CA Issuers).
+
+<li>FQDN du reverse proxy frontal, exposé publiquement pour distribuer des certificats racines et intermédiaires (Authority Information Access - CA Issuers) :
 
 ```
 dist.example.com
 ```
+</li>
+</ul>
 
 
 Révocation de certificats
