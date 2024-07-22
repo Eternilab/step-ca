@@ -120,7 +120,9 @@ proxy_env:
 # step_ca_email: "admin@example.com"
 
 # Domain name to sign certificates for
-# Used in templating for leaf certificates
+# Used in templating for leaf certificates :
+# When a Certificate Signing Request is presented to the CA, the FQDN in
+# that CSR must end with this string to be valid.
 # step_ca_domain: "example.com"
 
 step_ca_structure:
