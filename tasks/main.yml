@@ -5,7 +5,16 @@
 #   tags:
 #     - step-ca
 
+- name: "Version test"
+  ansible.builtin.fail:
+    msg: The step_ca_version variable isn't defined
+  when: step_ca_version is undefined
+  tags:
+    - step-ca
+
 - name: "Handling step and step-ca role"
   ansible.builtin.import_tasks: step-ca.yml
+  when:
+    - step_ca_version is defined
   tags:
     - step-ca
