@@ -73,9 +73,6 @@ step_ca_apt_state: present
 ### Default user variables
 #####
 
-step_ca_server_listen_port: 9100
-step_ca_server_insecure_port: 8080
-step_ca_client_listen_port: 9101
 
 # ./bin/step-ca /home/oline/.step/config/ca_server.json --password-file /home/oline/.step/secrets/s1_ca_password.txt
 step_ca_filelist:
@@ -139,30 +136,35 @@ step_ca_structure:
     keycurve: P-384
   SubCA:
     ocspFQDN: "ocsp.example.com"
-    S1:
-      is_root: false
-      organisation: "Ma Societe"
-      locality: "Paris"
-      province: "IDF"
-      country: "FR"
-      minTLSCertDuration: "1440h"
-      maxTLSCertDuration: "2160h"
-      defaultTLSCertDuration: "2160h"
-      # match: ".*\\.example\\.com"
-      min_key_size_rsa: 512
-      extKeyUsage: serverAuth
-      IssuingCertificateURL: "http://dist.example.com/example.com-S1-SubCA.der"
-    C1:
-      is_root: false
-      organisation: "Ma Societe"
-      locality: "Paris"
-      province: "IDF"
-      country: "FR"
-      minTLSCertDuration: "1440h"
-      maxTLSCertDuration: "2160h"
-      defaultTLSCertDuration: "2160h"
-      # match: ".*\\.example\\.com"
-      min_key_size_rsa: 512
-      extKeyUsage: clientAuth
-      IssuingCertificateURL: "http://dist.example.com/example.com-C1-SubCA.der"
-      crlDistributionPoints: "http://crl.example.com/crl"
+    instances:
+      - name : "S1"
+        is_root: false
+        organisation: "Ma Societe"
+        locality: "Paris"
+        province: "IDF"
+        country: "FR"
+        minTLSCertDuration: "1440h"
+        maxTLSCertDuration: "2160h"
+        defaultTLSCertDuration: "2160h"
+        # match: ".*\\.example\\.com"
+        min_key_size_rsa: 512
+        extKeyUsage: serverAuth
+        IssuingCertificateURL: "http://dist.example.com/example.com-S1-SubCA.der"
+        listen_port: 9100
+        insecure_port: 8080
+      - name : "C1"
+        is_root: false
+        organisation: "Ma Societe"
+        locality: "Paris"
+        province: "IDF"
+        country: "FR"
+        minTLSCertDuration: "1440h"
+        maxTLSCertDuration: "2160h"
+        defaultTLSCertDuration: "2160h"
+        # match: ".*\\.example\\.com"
+        min_key_size_rsa: 512
+        extKeyUsage: clientAuth
+        IssuingCertificateURL: "http://dist.example.com/example.com-C1-SubCA.der"
+        crlDistributionPoints: "http://crl.example.com/crl"
+        listen_port: 9101
+        insecure_port: 8081

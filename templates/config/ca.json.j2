@@ -2,10 +2,10 @@
 {% if 'ca_servers' in group_names %}
     "root": "{{ step_ca_root_dir }}/certs/root_ca.crt",
     "federatedRoots": null,
-    "crt": "{{ step_ca_root_dir }}/certs/intermediate_ca_server.crt",
-    "key": "{{ step_ca_root_dir }}/secrets/intermediate_ca_server.key",
-    "address": "{{ ansible_default_ipv4.address }}:{{ step_ca_server_listen_port }}",
-    "insecureAddress": "{{ ansible_default_ipv4.address }}:{{ step_ca_server_insecure_port }}",
+    "crt": "{{ step_ca_root_dir }}/certs/{{ item.name }}/intermediate_ca.crt",
+    "key": "{{ step_ca_root_dir }}/secrets/{{ item.name }}/intermediate_ca.key",
+    "address": "{{ ansible_default_ipv4.address }}:{{ item.listen_port }}",
+    "insecureAddress": "{{ ansible_default_ipv4.address }}:{{ item.insecure_port }}",
     "dnsNames": [
       "ca.{{ step_ca_domain }}"
     ],
@@ -14,7 +14,7 @@
     },
     "db": {
 	"type": "badgerv2",
-	"dataSource": "{{ step_ca_root_dir }}/db_server",
+	"dataSource": "{{ step_ca_root_dir }}/db/{{ item.name }}/",
 	"badgerFileLoadingMode": ""
     },
     "authority": {
@@ -32,24 +32,24 @@
 		},
 		"encryptedKey": "TODO",
                 "claims": {
-                  "minTLSCertDuration": {{ step_ca_structure.SubCA.S1.minTLSCertDuration }},
-                  "maxTLSCertDuration": {{ step_ca_structure.SubCA.S1.maxTLSCertDuration }},
-                  "defaultTLSCertDuration": {{ step_ca_structure.SubCA.S1.defaultTLSCertDuration }},
+                  "minTLSCertDuration": "{{ item.minTLSCertDuration }}",
+                  "maxTLSCertDuration": "{{ item.maxTLSCertDuration }}",
+                  "defaultTLSCertDuration": "{{ item.defaultTLSCertDuration }}",
                   "disableRenewal": false,
                   "enableSSHCA": false
 		},
 		"options": {
                   "x509": {
-                    "templateFile": "{{ step_ca_root_dir }}/templates/certs/x509/leaf_server.tpl"
+                    "templateFile": "{{ step_ca_root_dir }}/templates/certs/x509/{{ item.name }}/leaf.tpl"
                   }
                 }
-            },
+            }
 	],
 	"template": {
-	    "country": "{{ step_ca_structure.SubCA.S1.country }}",
-            "organization": "{{ step_ca_structure.SubCA.S1.organisation }}",
-	    "locality": "{{ step_ca_structure.SubCA.S1.locality }}",
-	    "province": "{{ step_ca_structure.SubCA.S1.province }}"
+	    "country": "{{ item.country }}",
+            "organization": "{{ item.organisation }}",
+	    "locality": "{{ item.locality }}",
+	    "province": "{{ item.province }}"
 	},
 	"backdate": "1m0s"
     },
@@ -60,7 +60,7 @@
         "idpURL": "{{ step_ca_structure.SubCA.S1.crlDistributionPoints }}"
     },
 {% elif 'ra_servers' in group_names %}
-  "address": "{{ ansible_default_ipv4.address }}:{{ step_ca_server_listen_port }}",
+  "address": "{{ ansible_default_ipv4.address }}:{{ item.listen_port }}",
   "dnsNames": ["ra.{{ step_ca_domain }}"],
   "db": {
     "type": "badgerV2",
@@ -71,7 +71,7 @@
   },
   "authority": {
     "type": "stepcas",
-    "certificateAuthority": "https://ca.{{ step_ca_domain }}:{{ step_ca_server_listen_port }}",
+    "certificateAuthority": "https://ca.{{ step_ca_domain }}:{{ item.listen_port }}",
     "certificateAuthorityFingerprint": "TODO",
     "certificateIssuer": {
 	"type" : "jwk",
@@ -84,24 +84,24 @@
 	    "name": "acme",
 	    "forceCN": true,
 	    "claims": {
-	        "minTLSCertDuration": "{{ step_ca_structure.SubCA.S1.minTLSCertDuration }}",
-		"maxTLSCertDuration": "{{ step_ca_structure.SubCA.S1.maxTLSCertDuration }}",
-		"defaultTLSCertDuration": "{{ step_ca_structure.SubCA.S1.defaultTLSCertDuration }}",
+	        "minTLSCertDuration": "{{ item.minTLSCertDuration }}",
+		"maxTLSCertDuration": "{{ item.maxTLSCertDuration }}",
+		"defaultTLSCertDuration": "{{ item.defaultTLSCertDuration }}",
 		"disableRenewal": false,
 		"enableSSHCA": false
 	    },
 	    "options": {
 		"x509": {
-		    "templateFile": "{{ step_ca_root_dir }}/templates/certs/x509/leaf_server.tpl"
+		    "templateFile": "{{ step_ca_root_dir }}/templates/certs/x509/{{ item.name }}leaf.tpl"
 		}
 	    }
 	}
     ],
     "template": {
-        "country": "{{ step_ca_structure.SubCA.S1.country }}",
-        "organization": "{{ step_ca_structure.SubCA.S1.organisation }}",
-	"locality": "{{ step_ca_structure.SubCA.S1.locality }}",
-	"province": "{{ step_ca_structure.SubCA.S1.province }}"
+        "country": "{{ item.country }}",
+        "organization": "{{ item.organisation }}",
+	"locality": "{{ item.locality }}",
+	"province": "{{ item.province }}"
     },
     "backdate": "1m0s"
   },
