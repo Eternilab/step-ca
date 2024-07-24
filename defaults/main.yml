@@ -74,11 +74,6 @@ step_ca_apt_state: present
 #####
 
 
-# ./bin/step-ca /home/oline/.step/config/ca_server.json --password-file /home/oline/.step/secrets/s1_ca_password.txt
-step_ca_filelist:
-  - config/ca_client.json
-  - config/ca_server.json
-
 step_ca_ca_templates:
   - templates/certs/x509/root.tpl
   - templates/certs/x509/intermediate_client.tpl
