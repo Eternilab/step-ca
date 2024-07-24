@@ -149,7 +149,8 @@ step_ca_structure:
         # match: ".*\\.example\\.com"
         min_key_size_rsa: 512
         extKeyUsage: serverAuth
-        IssuingCertificateURL: "http://dist.example.com/example.com-S1-SubCA.der"
+        IssuingCertificateURL: "http://dist.s1.example.com/example.com-SubCA.der"
+        crlDistributionPoints: "http://crl.s1.example.com/crl"
         listen_port: 9100
         insecure_port: 8080
       - name : "C1"
@@ -164,7 +165,7 @@ step_ca_structure:
         # match: ".*\\.example\\.com"
         min_key_size_rsa: 512
         extKeyUsage: clientAuth
-        IssuingCertificateURL: "http://dist.example.com/example.com-C1-SubCA.der"
-        crlDistributionPoints: "http://crl.example.com/crl"
+        IssuingCertificateURL: "http://dist.c1.example.com/example.com-SubCA.der"
+        crlDistributionPoints: "http://crl.c1.example.com/crl"
         listen_port: 9101
         insecure_port: 8081
