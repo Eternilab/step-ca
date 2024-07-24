@@ -66,26 +66,13 @@
 ### Pre-Configuration
 - name: "Be sure conf directories exist in {{ step_ca_root_dir }}"
   ansible.builtin.file:
-    name: "{{ step_ca_root_dir }}/{{ item }}"
+    name: "{{ step_ca_root_dir }}/{{ item[0] }}/{{ item[1].name }}"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
     mode: '0700'
     recurse: false
     state: directory
-  loop: "{{ step_ca_dirlist }}"
-  when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
-  become: true
-  tags:
-    - conf
-
-- name: "Be sure spool directory exists"
-  ansible.builtin.file:
-    name: "{{ step_ca_root_dir }}/templates/certs/x509"
-    owner: "{{ step_ca_user }}"
-    group: "{{ step_ca_group }}"
-    mode: '0700'
-    recurse: false
-    state: directory
+  loop: "{{ step_ca_dirlist | product(step_ca_structure.SubCA.instances) }}"
   when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
   become: true
   tags:

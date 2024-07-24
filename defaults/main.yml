@@ -86,10 +86,9 @@ step_ca_ra_templates:
 step_ca_dirlist:
   - certs
   - config
-  - db_server
-  - db_client
+  - db
   - secrets
-  - templates
+  - templates/certs/x509
 
 
 # This will use a YubiHSM to store the intermediate CAs, otherwise it'll be stored on disk.
