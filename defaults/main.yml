@@ -74,14 +74,10 @@ step_ca_apt_state: present
 #####
 
 
-step_ca_ca_templates:
+step_ca_templates:
   - templates/certs/x509/root.tpl
   - templates/certs/x509/intermediate_client.tpl
   - templates/certs/x509/intermediate_server.tpl
-
-step_ca_ra_templates:
-  - templates/certs/x509/leaf_client.tpl
-  - templates/certs/x509/leaf_server.tpl
 
 step_ca_dirlist:
   - certs
