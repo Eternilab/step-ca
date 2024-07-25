@@ -225,7 +225,7 @@
 
 - name: "Remove password file for CA as it won't be of any use"
   ansible.builtin.file:
-    path: "{{ step_ca_root_dir }}/secrets/root_ca_password_file"
+    path: "{{ step_ca_root_dir }}/secrets/root_ca_password.txt"
     state: absent
   when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm
   become: true
