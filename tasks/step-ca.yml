@@ -145,8 +145,8 @@
 
 - name: "Check if CA public key/certificate exists"
   ansible.builtin.stat:
-    # name: "{{ step_ca_root_dir }}/certs/root_ca.crt"
-    name: "{{ step_ca_root_dir }}/secrets/root_ca.crt"
+    name: "{{ step_ca_root_dir }}/certs/root_ca.crt"
+    # name: "{{ step_ca_root_dir }}/secrets/root_ca.crt"
   register: ca_pub_key
   when: inventory_hostname in groups['ca_servers']
   become: true
@@ -170,7 +170,7 @@
 - name: "Generate random password for CA if none set"
   ansible.builtin.set_fact:
     root_ca_password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_letters', 'digits', 'punctuation']) }}"
-  when: root_ca_password is undefined
+  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists and root_ca_password is undefined
   tags:
     - conf
 
