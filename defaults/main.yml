@@ -143,6 +143,7 @@ step_ca_structure:
         crlDistributionPoints: "http://crl.s1.example.com/crl"
         listen_port: 9100
         insecure_port: 8080
+#        intermediate_ca_password: "p@55w0rd"
       - name : "C1"
         is_root: false
         organisation: "Ma Societe"
@@ -159,3 +160,4 @@ step_ca_structure:
         crlDistributionPoints: "http://crl.c1.example.com/crl"
         listen_port: 9101
         insecure_port: 8081
+#        intermediate_ca_password: "p@55w0rd"
