@@ -106,6 +106,14 @@
 #   tags:
 #     - conf
 
+- name: "Generate random password for CA if none set"
+  ansible.builtin.set_fact:
+    root_ca_password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_letters', 'digits', 'punctuation']) }}"
+  when: root_ca_password is undefined
+  tags:
+    - conf
+    - toto
+
 - name: "Create password file for CA"
   ansible.builtin.template:
     src: "secrets/root_ca_password_file.j2"
