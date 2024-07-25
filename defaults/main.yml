@@ -73,12 +73,6 @@ step_ca_apt_state: present
 ### Default user variables
 #####
 
-
-step_ca_templates:
-  - templates/certs/x509/root.tpl
-  - templates/certs/x509/intermediate_client.tpl
-  - templates/certs/x509/intermediate_server.tpl
-
 step_ca_dirlist:
   - certs
   - config

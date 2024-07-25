@@ -95,7 +95,7 @@
   tags:
     - conf
 
-- name: "Update systemd service file in order to use correct conf file (ca_server.json)"
+- name: "Update systemd service file in order to use correct conf file (TODO change and generate for all intermediate CAs and for all RAs)"
   ansible.builtin.replace:
     path: "{{ step_ca_systemd_svc_file }}"
     regexp: 'ca.json'
@@ -106,7 +106,7 @@
     - Systemd daemon-reload
   # when: ca_servers
 
-- name: "Be sure step-ca CA leaf templates are configured"
+- name: "Be sure step-ca leaf templates are configured"
   ansible.builtin.template:
     src: "templates/certs/x509/leaf.tpl.j2"
     dest: "{{ step_ca_root_dir }}/templates/certs/x509/{{ item.name }}/leaf.tpl"
@@ -123,16 +123,32 @@
   tags:
     - conf
 
-- name: "Be sure step-ca CA other templates are configured"
+- name: "Be sure step-ca intermediate CA template is configured"
   ansible.builtin.template:
-    src: "{{ item }}.j2"
-    dest: "{{ step_ca_root_dir }}/{{ item }}"
+    src: "templates/certs/x509/intermediate.tpl.j2"
+    dest: "{{ step_ca_root_dir }}/templates/certs/x509/{{ item.name }}/intermediate.tpl"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
     mode: '0600'
     variable_start_string: '@{'
     variable_end_string: '}@'
-  with_items: "{{ step_ca_templates }}"
+  with_items: "{{ step_ca_structure.SubCA.instances }}"
+  become: true
+  when: inventory_hostname in groups['ca_servers']
+  # notify:
+  #   - "Restart step-ca"
+  tags:
+    - conf
+
+- name: "Be sure step-ca root CA template is configured"
+  ansible.builtin.template:
+    src: "templates/certs/x509/root.tpl.j2"
+    dest: "{{ step_ca_root_dir }}/templates/certs/x509/root.tpl"
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_group }}"
+    mode: '0600'
+    variable_start_string: '@{'
+    variable_end_string: '}@'
   become: true
   when: inventory_hostname in groups['ca_servers']
   # notify:

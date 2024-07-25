@@ -1,0 +1,15 @@
+{
+    "subject": {
+	"country": "@{ item.country }@",
+        "organization": "@{ item.organisation }@",
+	"locality": "@{ item.locality }@",
+	"province": "@{ item.province }@",
+	"commonName": {{ toJson .Subject.CommonName }}
+    },
+    "keyUsage": ["certSign", "crlSign"],
+    "basicConstraints": {
+        "isCA": true,
+        "maxPathLen": 0
+    },
+    "IssuingCertificateURL": ["@{ item.IssuingCertificateURL }@"]
+}
