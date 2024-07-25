@@ -143,85 +143,15 @@
 ###########################
 ### Configuration des clefs racines et intermédiaires
 
-- name: "Check if CA public key/certificate exists"
-  ansible.builtin.stat:
-    name: "{{ step_ca_root_dir }}/certs/root_ca.crt"
-    # name: "{{ step_ca_root_dir }}/secrets/root_ca.crt"
-  register: ca_pub_key
-  when: inventory_hostname in groups['ca_servers']
-  become: true
+- name: "Configure root CA keys"
+  ansible.builtin.import_tasks: root.yml
+
+- name: "Configure keys for each instance of intermediate CA"
+  ansible.builtin.include_tasks: intermediate.yml
+  with_items:
+    "{{ step_ca_structure.SubCA.instances }}"
   tags:
-    - conf
-
-# - name: "Check if CA private key exists"
-#   ansible.builtin.file:
-#     name: "{{ step_ca_root_dir }}/secrets/root_ca.key"
-#     owner: "{{ step_ca_user }}"
-#     group: "{{ step_ca_group }}"
-#     # mode: '0600'
-#     recurse: false
-#     state: present
-#   register: ca_private_key
-#   when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key
-#   become: true
-#   tags:
-#     - conf
-
-- name: "Generate random password for CA if none set"
-  ansible.builtin.set_fact:
-    root_ca_password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_letters', 'digits', 'punctuation']) }}"
-  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists and root_ca_password is undefined
-  tags:
-    - conf
-
-- name: "Create password file for CA"
-  ansible.builtin.template:
-    src: "secrets/root_ca_password_file.j2"
-    dest: "{{ step_ca_root_dir }}/secrets/root_ca_password_file"
-    owner: "{{ step_ca_user }}"
-    group: "{{ step_ca_group }}"
-    mode: '0400'
-  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
-  become: true
-  # notify:
-  #   - "Restart step-ca"
-  tags:
-    - conf
-
-- name: "Create CA private and public keys"
-  ansible.builtin.command:
-    cmd: "step certificate create --template={{ step_ca_root_dir }}/templates/certs/x509/root.tpl --password-file {{ step_ca_root_dir }}/secrets/root_ca_password_file  --kty {{ step_ca_structure.rootCA.keytype }} --curve {{ step_ca_structure.rootCA.keycurve }} \"ca.{{ step_ca_domain }}\" {{ step_ca_root_dir }}/secrets/root_ca.crt {{ step_ca_root_dir }}/secrets/root_ca.key"
-  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
-  become: true
-  changed_when: true
-  tags:
-    - conf
-
-- name: "Fix CA private key ownership and rights"
-  ansible.builtin.file:
-    name: "{{ step_ca_root_dir }}/secrets/root_ca.key"
-    owner: "{{ step_ca_user }}"
-    group: "{{ step_ca_group }}"
-    mode: '0400'
-    state: file
-  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
-  become: true
-  tags:
-    - conf
-
-- name: "Fix CA public key/certificate ownership and rights"
-  ansible.builtin.file:
-    name: "{{ step_ca_root_dir }}/secrets/root_ca.crt"
-    owner: "{{ step_ca_user }}"
-    group: "{{ step_ca_group }}"
-    mode: '0600'
-    state: file
-  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
-  become: true
-  tags:
-    - conf
-
-# step certificate create intermediate-ca intermediate-ca.crt intermediate-ca.key --profile intermediate-ca --ca ./root-ca.crt --ca-key ./root-ca.key
+    - instancestest
 
 - name: "Check there is no root CA private key left in secret folder"
   ansible.builtin.stat:

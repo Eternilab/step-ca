@@ -1,0 +1,72 @@
+###########################
+### Configuration des clefs intermédiaires
+
+
+- name: "Check if intermediate CA instance public key/certificate exists"
+  ansible.builtin.stat:
+    name: "{{ step_ca_root_dir }}/certs/{{ item.name }}/intermediate_ca.crt"
+  register: ca_pub_key
+  when: inventory_hostname in groups['ca_servers']
+  become: true
+  tags:
+    - conf
+    - instancestest
+
+- name: "Generate random password for intermediate CA instance if none set"
+  ansible.builtin.set_fact:
+    intermediate_ca_password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_letters', 'digits', 'punctuation']) }}"
+  when: intermediate_ca_password is undefined and inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  tags:
+    - conf
+    - instancestest
+
+- name: "Create password file for intermediate CA instance"
+  ansible.builtin.template:
+    src: "secrets/intermediate_ca_password.txt.j2"
+    dest: "{{ step_ca_root_dir }}/secrets/{{ item.name }}/intermediate_ca_password.txt"
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_group }}"
+    mode: '0400'
+  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  become: true
+  # notify:
+  #   - "Restart step-ca"
+  tags:
+    - conf
+    - instancestest
+
+- name: "Create intermediate CA instance private and public keys"
+  ansible.builtin.command:
+    cmd: "step certificate create --template={{ step_ca_root_dir }}/templates/certs/x509/{{ item.name }}/intermediate.tpl --password-file {{ step_ca_root_dir }}/secrets/{{ item.name }}/intermediate_ca_password.txt --kty {{ step_ca_structure.rootCA.keytype }} --curve {{ step_ca_structure.rootCA.keycurve }} \"ca.{{ step_ca_domain }}\" {{ step_ca_root_dir }}/secrets/{{ item.name }}/intermediate_ca.crt {{ step_ca_root_dir }}/secrets/{{ item.name }}/inermediate_ca.key"
+  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  become: true
+  changed_when: true
+  tags:
+    - conf
+    - instancestest
+
+- name: "Fix intermediate CA instance private key ownership and rights"
+  ansible.builtin.file:
+    name: "{{ step_ca_root_dir }}/secrets/{{ item.name }}/intermediate_ca.key"
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_group }}"
+    mode: '0400'
+    state: file
+  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  become: true
+  tags:
+    - conf
+    - instancestest
+
+- name: "Fix intermediate CA instance public key/certificate ownership and rights"
+  ansible.builtin.file:
+    name: "{{ step_ca_root_dir }}/secrets/{{ item.name }}/intermediate_ca.crt"
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_group }}"
+    mode: '0600'
+    state: file
+  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  become: true
+  tags:
+    - conf
+    - instancestest
