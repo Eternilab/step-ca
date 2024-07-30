@@ -11,5 +11,7 @@
         "isCA": true,
         "maxPathLen": 0
     },
-    "IssuingCertificateURL": ["@{ item.IssuingCertificateURL }@"]
+    "IssuingCertificateURL": ["@{ step_ca_structure.rootCA.IssuingCertificateURL }@"],
+    "crlDistributionPoints": ["@{ step_ca_structure.rootCA.crlDistributionPoints }@"]
 }
+

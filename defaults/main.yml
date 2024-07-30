@@ -118,10 +118,15 @@ step_ca_structure:
     # EC: P-256, P-384, P-521
     # OKP: Ed25519
     keycurve: P-384
+    certDuration: "87600h"
+    IssuingCertificateURL: "http://issuers.pki.example.com/root/example.com-CA.der"
+    crlDistributionPoints: "http://crl.pki.example.com/root/crl"
   SubCA:
-    ocspFQDN: "ocsp.example.com"
+    certDuration: "43800h"
+    ocspFQDN: "http://ocsp.pki.example.com"
     instances:
       - name : "S1"
+# is_root devrait pouvoir être supprimé, une sub ne sera jamais racine
         is_root: false
         organisation: "Ma Societe"
         locality: "Paris"
@@ -133,12 +138,13 @@ step_ca_structure:
         # match: ".*\\.example\\.com"
         min_key_size_rsa: 512
         extKeyUsage: serverAuth
-        IssuingCertificateURL: "http://dist.s1.example.com/example.com-SubCA.der"
-        crlDistributionPoints: "http://crl.s1.example.com/crl"
+        IssuingCertificateURL: "http://issuers.pki.example.com/s1/example.com-SubCA.der"
+        crlDistributionPoints: "http://crl.pki.example.com/s1/crl"
         listen_port: 9100
         insecure_port: 8080
 #        intermediate_ca_password: "p@55w0rd"
       - name : "C1"
+# is_root devrait pouvoir être supprimé, une sub ne sera jamais racine
         is_root: false
         organisation: "Ma Societe"
         locality: "Paris"
@@ -150,8 +156,8 @@ step_ca_structure:
         # match: ".*\\.example\\.com"
         min_key_size_rsa: 512
         extKeyUsage: clientAuth
-        IssuingCertificateURL: "http://dist.c1.example.com/example.com-SubCA.der"
-        crlDistributionPoints: "http://crl.c1.example.com/crl"
+        IssuingCertificateURL: "http://issuers.pki.example.com/c1/example.com-SubCA.der"
+        crlDistributionPoints: "http://crl.pki.example.com/c1/crl"
         listen_port: 9101
         insecure_port: 8081
 #        intermediate_ca_password: "p@55w0rd"

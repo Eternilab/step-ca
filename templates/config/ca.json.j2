@@ -57,7 +57,7 @@
         "enabled": true,
         "generateOnRevoke": true,
         "cacheDuration": "24h0m0s",
-        "idpURL": "{{ step_ca_structure.SubCA.S1.crlDistributionPoints }}"
+        "idpURL": "{{ item.crlDistributionPoints }}"
     },
 {% elif 'ra_servers' in group_names %}
   "address": "{{ ansible_default_ipv4.address }}:{{ item.listen_port }}",
