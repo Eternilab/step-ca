@@ -95,11 +95,13 @@
   tags:
     - conf
 
-- name: "Update systemd service file in order to use correct conf file (TODO change and generate for all intermediate CAs and for all RAs)"
-  ansible.builtin.replace:
-    path: "{{ step_ca_systemd_svc_file }}"
-    regexp: 'ca.json'
-    replace: 'ca_server.json'
+- name: "Systemd service file installed (TODO missing RAs)"
+  ansible.builtin.template:
+    src: "step-ca.service.j2"
+    dest: "/etc/systemd/system/step-ca-{{ item.name }}.service"
+  with_items: "{{ step_ca_structure.SubCA.instances }}"
+  loop_control:
+    label: "{{ item.name }} Intermediate CA"
   when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
   become: true
   notify:

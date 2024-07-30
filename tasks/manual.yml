@@ -72,31 +72,6 @@
   tags:
     - install
 
-- name: "Copy step-ca systemd service file to {{ step_ca_systemd_svc_file }}"
-  ansible.builtin.copy:
-    src: "{{ step_ca_tmp_dir }}/certificates-{{ step_ca_version }}/systemd/step-ca.service"
-    dest: "{{ step_ca_systemd_svc_file }}"
-    owner: "{{ step_ca_user }}"
-    group: "{{ step_ca_group }}"
-    mode: '0644'
-    remote_src: true
-  when: not installed.stat.exists
-  become: true
-  notify:
-    - Systemd daemon-reload
-  tags:
-    - install
-
-- name: "Update systemd service file in order to use correct binary path ({{ step_ca_bin_file }})"
-  ansible.builtin.replace:
-    path: "{{ step_ca_systemd_svc_file }}"
-    regexp: '/usr/bin/step-ca'
-    replace: "{{ step_ca_bin_file }}"
-  when: not installed.stat.exists
-  become: true
-  notify:
-    - Systemd daemon-reload
-
 ### Cleaning install files
 - name: "Clean tarball in {{ step_ca_tmp_dir }}"
   ansible.builtin.file:

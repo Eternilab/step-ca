@@ -77,49 +77,7 @@
   tags:
     - install
 
-- name: "Download step-ca systemd service file"
-  ansible.builtin.get_url:
-    url: "{{ step_ca_url_systemd_svc_file }}"
-    dest: "{{ step_ca_tmp_dir }}/step-ca.service"
-    mode: '0640'
-  environment: "{{ proxy_env }}"
-  when: not installed.stat.exists
-  check_mode: false
-  tags:
-    - install
-
-- name: "Copy step-ca systemd service file to {{ step_ca_systemd_svc_file }}"
-  ansible.builtin.copy:
-    src: "{{ step_ca_tmp_dir }}/step-ca.service"
-    dest: "{{ step_ca_systemd_svc_file }}"
-    owner: "{{ step_ca_user }}"
-    group: "{{ step_ca_group }}"
-    mode: '0644'
-    remote_src: true
-  when: not installed.stat.exists
-  become: true
-  tags:
-    - install
-
-- name: "Update systemd service file in order to use correct binary path ({{ step_ca_bin_file }})"
-  ansible.builtin.replace:
-    path: "{{ step_ca_systemd_svc_file }}"
-    regexp: '/usr/bin/step-ca'
-    replace: "{{ step_ca_bin_file }}"
-  when: not installed.stat.exists
-  become: true
-  notify:
-    - Systemd daemon-reload
-
 ### Cleaning install files
-- name: "Clean temporary systemd service file in {{ step_ca_tmp_dir }}"
-  ansible.builtin.file:
-    name: "{{ step_ca_tmp_dir }}/step-ca.service"
-    state: absent
-  when: not installed.stat.exists
-  tags:
-    - install
-
 - name: "Remove unused files from tarball extraction"
   ansible.builtin.file:
     path: "{{ item }}"
