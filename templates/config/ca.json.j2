@@ -7,7 +7,7 @@
     "address": "{{ ansible_default_ipv4.address }}:{{ item.listen_port }}",
     "insecureAddress": "{{ ansible_default_ipv4.address }}:{{ item.insecure_port }}",
     "dnsNames": [
-      "ca.{{ step_ca_domain }}"
+      "{{ ansible_host }}"
     ],
     "logger": {
 	"format": "text"
