@@ -21,7 +21,7 @@
 	"provisioners": [
 	    {
 		"type": "JWK",
-		"name": "{{ step_ca_email }}",
+		"name": "{{ step_ca_admin_jwk_name }}",
 		"key": {
 		    "use": "sig",
 		    "kty": "OKP",
@@ -75,7 +75,7 @@
     "certificateAuthorityFingerprint": "TODO",
     "certificateIssuer": {
 	"type" : "jwk",
-	"provisioner": "{{ step_ca_email }}",
+	"provisioner": "{{ step_ca_admin_jwk_name }}",
 	"key": "{{ step_ca_root_dir }}/secrets/ra_key.pem"
     },
     "provisioners": [

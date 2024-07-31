@@ -97,7 +97,7 @@ proxy_env:
 #   https_proxy: http://proxy.example.com:3128
 #   ftp_proxy: http://proxy.example.com:3128
 
-# Technical contact
+# Default administrator name/email, used to create the first Json Web Key for admin acces (JWK provider)) to the step-ca service.
 # step_ca_email: "admin@example.com"
 
 # Domain name to sign certificates for
