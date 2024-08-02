@@ -94,8 +94,8 @@
     label: "{{ item.name }} Intermediate CA"
   when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
   become: true
-  # notify:
-  #   - "Restart step-ca"
+  notify:
+    - "Reload step-ca"
   tags:
     - conf
 
@@ -110,9 +110,22 @@
   become: true
   notify:
     - Systemd daemon-reload
+    - "Restart step-ca"
   tags:
     - conf
-  # when: ca_servers
+  # when: ca_servers222
+
+- name: "Check service {{ item.name }} is enable"
+  ansible.builtin.service:
+    name: "step-ca-{{ item.name }}.service"
+    enabled: yes
+  with_items: "{{ step_ca_structure.SubCA.instances }}"
+  loop_control:
+    label: "{{ item.name }} Intermediate CA"
+  when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
+  become: true
+  tags:
+    - conf
 
 - name: "Be sure step-ca leaf templates are configured"
   ansible.builtin.template:
@@ -128,8 +141,8 @@
     label: "{{ item.name }} Intermediate CA"
   become: true
   when: inventory_hostname in groups['ca_servers']
-  # notify:
-  #   - "Restart step-ca"
+  notify:
+    - "Reload step-ca"
   tags:
     - conf
 
@@ -147,8 +160,6 @@
     label: "{{ item.name }} Intermediate CA"
   become: true
   when: inventory_hostname in groups['ca_servers']
-  # notify:
-  #   - "Restart step-ca"
   tags:
     - conf
 
@@ -163,8 +174,6 @@
     variable_end_string: '}@'
   become: true
   when: inventory_hostname in groups['ca_servers']
-  # notify:
-  #   - "Restart step-ca"
   tags:
     - conf
 
@@ -173,6 +182,8 @@
 
 - name: "Configure root CA keys"
   ansible.builtin.import_tasks: root.yml
+  notify:
+    - "Reload step-ca"
   tags:
     - conf
 
@@ -211,5 +222,17 @@
       !! -- Warning -- !!
   when: ca_password_root_left.stat.exists or ca_key_left.stat.exists
   changed_when: true
+  tags:
+    - conf
+
+- name: "Check step-ca {{ item.name }} service is started"
+  ansible.builtin.service:
+    name: "step-ca-{{ item.name }}.service"
+    state: started
+  with_items: "{{ step_ca_structure.SubCA.instances }}"
+  loop_control:
+    label: "{{ item.name }} Intermediate CA"
+  when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
+  become: true
   tags:
     - conf

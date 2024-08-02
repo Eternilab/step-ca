@@ -28,8 +28,8 @@
   when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
   no_log: true
   become: true
-  # notify:
-  #   - "Restart step-ca"
+  notify:
+    - "Reload step-ca"
   tags:
     - conf
 
@@ -61,6 +61,8 @@
   when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
   become: true
   changed_when: true
+  notify:
+    - "Reload step-ca"
   tags:
     - conf
 
@@ -73,6 +75,8 @@
     state: file
   when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
   become: true
+  notify:
+    - "Reload step-ca"
   tags:
     - conf
 
@@ -85,5 +89,7 @@
     state: file
   when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
   become: true
+  notify:
+    - "Reload step-ca"
   tags:
     - conf

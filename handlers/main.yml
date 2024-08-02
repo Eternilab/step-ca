@@ -1,10 +1,21 @@
 ---
-- name: Systemd daemon-reload
+- name: "Systemd daemon-reload"
   ansible.builtin.systemd:
     daemon_reload: true
   become: true
 - name: "Restart step-ca"
   ansible.builtin.service:
-    name: step-ca
+    name: "step-ca-{{ item.name }}"
     state: restarted
+  with_items: "{{ step_ca_structure.SubCA.instances }}"
+  loop_control:
+    label: "{{ item.name }} Intermediate CA"
+  become: true
+- name: "Reload step-ca"
+  ansible.builtin.service:
+    name: "step-ca-{{ item.name }}"
+    state: reloaded
+  with_items: "{{ step_ca_structure.SubCA.instances }}"
+  loop_control:
+    label: "{{ item.name }} Intermediate CA"
   become: true
