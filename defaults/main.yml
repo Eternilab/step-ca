@@ -132,9 +132,9 @@ step_ca_structure:
         locality: "Paris"
         province: "IDF"
         country: "FR"
-        minTLSCertDuration: "1440h"
-        maxTLSCertDuration: "2160h"
-        defaultTLSCertDuration: "2160h"
+        minTLSCertDuration: "1440h0m0s"
+        maxTLSCertDuration: "2160h0m0s"
+        defaultTLSCertDuration: "2160h0m0s"
         # match: ".*\\.example\\.com"
         min_key_size_rsa: 512
         extKeyUsage: serverAuth
@@ -150,9 +150,9 @@ step_ca_structure:
         locality: "Paris"
         province: "IDF"
         country: "FR"
-        minTLSCertDuration: "1440h"
-        maxTLSCertDuration: "2160h"
-        defaultTLSCertDuration: "2160h"
+        minTLSCertDuration: "1440h0m0s"
+        maxTLSCertDuration: "2160h0m0s"
+        defaultTLSCertDuration: "2160h0m0s"
         # match: ".*\\.example\\.com"
         min_key_size_rsa: 512
         extKeyUsage: clientAuth

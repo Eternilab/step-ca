@@ -1,119 +1,106 @@
 {
 {% if 'ca_servers' in group_names %}
-    "root": "{{ step_ca_root_dir }}/certs/root_ca.crt",
-    "federatedRoots": null,
-    "crt": "{{ step_ca_root_dir }}/certs/{{ item.name }}/intermediate_ca.crt",
-    "key": "{{ step_ca_root_dir }}/secrets/{{ item.name }}/intermediate_ca.key",
-    "address": "{{ ansible_default_ipv4.address }}:{{ item.listen_port }}",
-    "insecureAddress": "{{ ansible_default_ipv4.address }}:{{ item.insecure_port }}",
-    "dnsNames": [
-      "{{ ansible_host }}"
-    ],
-    "logger": {
-	"format": "text"
-    },
-    "db": {
-	"type": "badgerv2",
-	"dataSource": "{{ step_ca_root_dir }}/db/{{ item.name }}/",
-	"badgerFileLoadingMode": ""
-    },
-    "authority": {
-	"provisioners": [
-	    {
-		"type": "JWK",
-		"name": "{{ step_ca_admin_jwk_name }}",
-		"key": {
-		    "use": "sig",
-		    "kty": "OKP",
-		    "kid": "TODO",
-		    "crv": "Ed25519",
-		    "alg": "EdDSA",
-		    "x": "QpBaMgq-liKM0bWuvRrhwebzaxDTgziSJxf9ryz5DDY"
-		},
-		"encryptedKey": "TODO",
-                "claims": {
-                  "minTLSCertDuration": "{{ item.minTLSCertDuration }}",
-                  "maxTLSCertDuration": "{{ item.maxTLSCertDuration }}",
-                  "defaultTLSCertDuration": "{{ item.defaultTLSCertDuration }}",
-                  "disableRenewal": false,
-                  "enableSSHCA": false
-		},
-		"options": {
-                  "x509": {
-                    "templateFile": "{{ step_ca_root_dir }}/templates/certs/x509/{{ item.name }}/leaf.tpl"
-                  }
-                }
-            }
-	],
-	"template": {
-	    "country": "{{ item.country }}",
-            "organization": "{{ item.organisation }}",
-	    "locality": "{{ item.locality }}",
-	    "province": "{{ item.province }}"
-	},
-	"backdate": "1m0s"
-    },
-    "crl": {
-        "enabled": true,
-        "generateOnRevoke": true,
-        "cacheDuration": "24h0m0s",
-        "idpURL": "{{ item.crlDistributionPoints }}"
-    },
-{% elif 'ra_servers' in group_names %}
-  "address": "{{ ansible_default_ipv4.address }}:{{ item.listen_port }}",
-  "dnsNames": ["ra.{{ step_ca_domain }}"],
-  "db": {
-    "type": "badgerV2",
-    "dataSource": "{{ step_ca_root_dir }}/db"
-  },
-  "logger": {
-      "format": "text"
-  },
-  "authority": {
-    "type": "stepcas",
-    "certificateAuthority": "https://ca.{{ step_ca_domain }}:{{ item.listen_port }}",
-    "certificateAuthorityFingerprint": "TODO",
-    "certificateIssuer": {
-	"type" : "jwk",
-	"provisioner": "{{ step_ca_admin_jwk_name }}",
-	"key": "{{ step_ca_root_dir }}/secrets/ra_key.pem"
-    },
-    "provisioners": [
-	{
-	    "type": "ACME",
-	    "name": "acme",
-	    "forceCN": true,
-	    "claims": {
-	        "minTLSCertDuration": "{{ item.minTLSCertDuration }}",
-		"maxTLSCertDuration": "{{ item.maxTLSCertDuration }}",
-		"defaultTLSCertDuration": "{{ item.defaultTLSCertDuration }}",
-		"disableRenewal": false,
-		"enableSSHCA": false
-	    },
-	    "options": {
-		"x509": {
-		    "templateFile": "{{ step_ca_root_dir }}/templates/certs/x509/{{ item.name }}leaf.tpl"
-		}
-	    }
-	}
-    ],
-    "template": {
-        "country": "{{ item.country }}",
-        "organization": "{{ item.organisation }}",
-	"locality": "{{ item.locality }}",
-	"province": "{{ item.province }}"
-    },
-    "backdate": "1m0s"
-  },
+	"root": "{{ step_ca_root_dir }}/certs/root_ca.crt",
+	"federatedRoots": null,
+	"crt": "{{ step_ca_root_dir }}/certs/{{ item.name }}/intermediate_ca.crt",
+	"key": "{{ step_ca_root_dir }}/secrets/{{ item.name }}/intermediate_ca.key",
 {% endif %}
-  "tls": {
-    "cipherSuites": [
-      "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
-      "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA256",
-      "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"
-    ],
-    "minVersion": 1.3,
-    "maxVersion": 1.3,
-    "renegotiation": false
-  }
+	"address": "{{ ansible_default_ipv4.address }}:{{ item.listen_port }}",
+	"insecureAddress": "{{ ansible_default_ipv4.address }}:{{ item.insecure_port }}",
+	"dnsNames": [
+		"{{ ansible_host }}"
+	],
+	"logger": {
+		"format": "text"
+	},
+	"db": {
+		"type": "badgerv2",
+		"dataSource": "{{ step_ca_root_dir }}/db/{{ item.name }}/",
+		"badgerFileLoadingMode": ""
+	},
+	"authority": {
+{% if 'ca_servers' in group_names %}
+		"provisioners": [
+			{
+				"type": "JWK",
+				"name": "{{ step_ca_admin_jwk_name }}",
+				"key": {
+					"use": "sig",
+					"kty": "OKP",
+					"kid": "TODO",
+					"crv": "Ed25519",
+					"alg": "EdDSA",
+					"x": "QpBaMgq-liKM0bWuvRrhwebzaxDTgziSJxf9ryz5DDY"
+				},
+				"encryptedKey": "TODO",
+				"claims": {
+					"minTLSCertDuration": "{{ item.minTLSCertDuration }}",
+					"maxTLSCertDuration": "{{ item.maxTLSCertDuration }}",
+					"defaultTLSCertDuration": "{{ item.defaultTLSCertDuration }}",
+					"enableSSHCA": false,
+					"disableRenewal": false
+				},
+				"options": {
+					"x509": {
+						"templateFile": "{{ step_ca_root_dir }}/templates/certs/x509/{{ item.name }}/leaf.tpl"
+					}
+				}
+			}
+		],
+{% elif 'ra_servers' in group_names %}
+		"type": "stepcas",
+		"certificateAuthority": "https://ca.{{ step_ca_domain }}:{{ item.listen_port }}",
+		"certificateAuthorityFingerprint": "TODO",
+		"certificateIssuer": {
+			"type" : "jwk",
+			"provisioner": "{{ step_ca_admin_jwk_name }}",
+			"key": "{{ step_ca_root_dir }}/secrets/ra_key.pem"
+		},
+		"provisioners": [
+			{
+				"type": "ACME",
+				"name": "acme",
+				"forceCN": true,
+				"claims": {
+					"minTLSCertDuration": "{{ item.minTLSCertDuration }}",
+					"maxTLSCertDuration": "{{ item.maxTLSCertDuration }}",
+					"defaultTLSCertDuration": "{{ item.defaultTLSCertDuration }}",
+					"disableRenewal": false,
+					"enableSSHCA": false
+				},
+				"options": {
+					"x509": {
+						"templateFile": "{{ step_ca_root_dir }}/templates/certs/x509/{{ item.name }}leaf.tpl"
+					}
+				}
+			}
+		],
+{% endif %}
+		"template": {
+			"country": "{{ item.country }}",
+			"organization": "{{ item.organisation }}",
+			"locality": "{{ item.locality }}",
+			"province": "{{ item.province }}"
+		},
+		"backdate": "1m0s"
+	},
+	"tls": {
+		"cipherSuites": [
+			"TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+			"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA256",
+			"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"
+		],
+		"minVersion": 1.3,
+		"maxVersion": 1.3,
+		"renegotiation": false
+{% if 'ca_servers' in group_names %}
+	},
+	"commonName": "Step Online CA",
+	"crl": {
+		"enabled": true,
+		"generateOnRevoke": true,
+		"cacheDuration": "24h0m0s",
+		"idpURL": "http://crl.pki.example.com/s1/crl"
+{% endif %}
+	}
 }
