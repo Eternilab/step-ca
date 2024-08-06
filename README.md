@@ -68,8 +68,8 @@ La variable "step_ca_structure" définit la structure de l'IGC. Chacune de ses v
 | Variable                   | Choix                    | Commentaires                                                       |
 |----------------------------|--------------------------|--------------------------------------------------------------------|
 | rootCA                     |                          | Clé qui prendra pour valeur les variables relatives à la CA racine |
-| SubCA                      |                          | Clé qui prendra pour valeur chacune des clés des CA intermédiaires |
-|   NomDeSubCA               |                          | Clé qui prendra pour valeur les variables relatives à cette CA intermédiaire. Peut être renommée comme voulue |
+| subCA                      |                          | Clé qui prendra pour valeur chacune des clés des CA intermédiaires |
+|   NomDesubCA               |                          | Clé qui prendra pour valeur les variables relatives à cette CA intermédiaire. Peut être renommée comme voulue |
 |     is_root                | Booléen                  | Doit être définie sur true pour la rootCA et elle uniquement       |
 |     organisation           | String                   | Nom de la société détentrice du certificat                         |
 |     locality               | Nom de commune           | |
@@ -88,7 +88,7 @@ Gestion des DNS
 ---------------
 
 <ul>
-<li>FQDN de la CA, sur laquelle tourne un step-ca en mode StepCAS CA qui a la capacité de signer avec l'identité de la SubCA (fichier ou HSM) :
+<li>FQDN de la CA, sur laquelle tourne un step-ca en mode StepCAS CA qui a la capacité de signer avec l'identité de la subCA (fichier ou HSM) :
 
 ```
 ca.example.com

@@ -54,7 +54,7 @@
       - --password-file
       - "{{ step_ca_root_dir }}/secrets/{{ item.name }}/intermediate_ca_password.txt"
       - --not-after
-      - "{{ step_ca_structure.SubCA.certDuration }}"
+      - "{{ step_ca_structure.subCA.certDuration }}"
       - "{{ item.name }} Intermediate CA"
       - "{{ step_ca_root_dir }}/certs/{{ item.name }}/intermediate_ca.crt"
       - "{{ step_ca_root_dir }}/secrets/{{ item.name }}/intermediate_ca.key"

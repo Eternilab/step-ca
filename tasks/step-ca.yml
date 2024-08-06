@@ -72,7 +72,7 @@
     mode: '0700'
     recurse: false
     state: directory
-  loop: "{{ step_ca_dirlist | product(step_ca_structure.SubCA.instances) }}"
+  loop: "{{ step_ca_dirlist | product(step_ca_structure.subCA.instances) }}"
   loop_control:
     label: "{{ step_ca_root_dir }}/{{ item[0] }}/{{ item[1].name }}"
   when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
@@ -89,7 +89,7 @@
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
     mode: '0600'
-  with_items: "{{ step_ca_structure.SubCA.instances }}"
+  with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
   when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
@@ -103,7 +103,7 @@
   ansible.builtin.template:
     src: "step-ca.service.j2"
     dest: "/etc/systemd/system/step-ca-{{ item.name }}.service"
-  with_items: "{{ step_ca_structure.SubCA.instances }}"
+  with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
   when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
@@ -119,7 +119,7 @@
   ansible.builtin.service:
     name: "step-ca-{{ item.name }}.service"
     enabled: yes
-  with_items: "{{ step_ca_structure.SubCA.instances }}"
+  with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
   when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
@@ -136,7 +136,7 @@
     mode: '0600'
     variable_start_string: '@{'
     variable_end_string: '}@'
-  with_items: "{{ step_ca_structure.SubCA.instances }}"
+  with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
   become: true
@@ -155,7 +155,7 @@
     mode: '0600'
     variable_start_string: '@{'
     variable_end_string: '}@'
-  with_items: "{{ step_ca_structure.SubCA.instances }}"
+  with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
   become: true
@@ -190,7 +190,7 @@
 - name: "Configure keys for each instance of intermediate CA"
   ansible.builtin.include_tasks: intermediate.yml
   with_items:
-    "{{ step_ca_structure.SubCA.instances }}"
+    "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
   tags:
@@ -229,7 +229,7 @@
   ansible.builtin.service:
     name: "step-ca-{{ item.name }}.service"
     state: started
-  with_items: "{{ step_ca_structure.SubCA.instances }}"
+  with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
   when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
