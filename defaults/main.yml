@@ -108,7 +108,7 @@ proxy_env:
 
 step_ca_structure:
   rootCA:
-    is_root: true
+    fqdn: "ca.pki.exemple.com"
     organisation: "Ma Societe"
     locality: "Paris"
     province: "IDF"
