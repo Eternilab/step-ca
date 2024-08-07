@@ -5,7 +5,6 @@
   ansible.builtin.stat:
     name: "{{ step_ca_root_dir }}/certs/root_ca.crt"
   register: ca_pub_key
-  when: inventory_hostname in groups['ca_servers']
   become: true
   tags:
     - conf
@@ -13,7 +12,7 @@
 - name: "Generate random password for root CA if none set"
   ansible.builtin.set_fact:
     root_ca_password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_letters', 'digits', 'punctuation']) }}"
-  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  when: not step_ca_yubihsm and not ca_pub_key.stat.exists
   no_log: true
   tags:
     - conf
@@ -25,7 +24,7 @@
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
     mode: '0400'
-  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  when: not step_ca_yubihsm and not ca_pub_key.stat.exists
   no_log: true
   become: true
   # notify:
@@ -52,7 +51,7 @@
       - "Root CA"
       - "{{ step_ca_root_dir }}/certs/root_ca.crt"
       - "{{ step_ca_root_dir }}/secrets/root_ca.key"
-  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  when: not step_ca_yubihsm and not ca_pub_key.stat.exists
   become: true
   changed_when: true
   tags:
@@ -65,7 +64,7 @@
     group: "{{ step_ca_group }}"
     mode: '0400'
     state: file
-  when: not ansible_check_mode and (inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists)
+  when: not ansible_check_mode and (not step_ca_yubihsm and not ca_pub_key.stat.exists)
   become: true
   tags:
     - conf
@@ -77,7 +76,7 @@
     group: "{{ step_ca_group }}"
     mode: '0400'
     state: file
-  when: not ansible_check_mode and (inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists)
+  when: not ansible_check_mode and (not step_ca_yubihsm and not ca_pub_key.stat.exists)
   become: true
   tags:
     - conf

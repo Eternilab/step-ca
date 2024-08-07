@@ -152,6 +152,7 @@
 
 - name: "Configure root CA keys"
   ansible.builtin.import_tasks: root.yml
+  when: inventory_hostname in groups['ca_servers']
   notify:
     - "Reload step-ca"
   tags:
@@ -171,6 +172,7 @@
     name: "{{ step_ca_root_dir}}/secrets/root_ca.key"
   register: ca_key_left
   become: true
+  when: inventory_hostname in groups['ca_servers']
   changed_when: ca_key_left.stat.exists
   tags:
     - conf
@@ -180,6 +182,7 @@
     name: "{{ step_ca_root_dir }}/secrets/root_ca_password.txt"
   register: ca_password_root_left
   become: true
+  when: inventory_hostname in groups['ca_servers']
   changed_when: ca_password_root_left.stat.exists
   tags:
     - conf
@@ -190,7 +193,7 @@
       !! -- Warning -- !!
       CA private key or password left in secret folder
       !! -- Warning -- !!
-  when: ca_password_root_left.stat.exists or ca_key_left.stat.exists
+  when: (ca_password_root_left.stat.exists or ca_key_left.stat.exists) and inventory_hostname in groups['ca_servers']
   changed_when: true
   tags:
     - conf
