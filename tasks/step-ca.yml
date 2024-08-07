@@ -69,7 +69,7 @@
   tags:
     - conf
 
-- name: "Systemd service file installed (TODO missing RAs)"
+- name: "Systemd service file installed"
   ansible.builtin.template:
     src: "step-ca.service.j2"
     dest: "/etc/systemd/system/step-ca-{{ item.name }}.service"
@@ -83,7 +83,6 @@
     - "Restart step-ca"
   tags:
     - conf
-  # when: ca_server222
 
 - name: "Check step-ca services are enable"
   ansible.builtin.service:
@@ -193,7 +192,7 @@
       !! -- Warning -- !!
       CA private key or password left in secret folder
       !! -- Warning -- !!
-  when: (ca_password_root_left.stat.exists or ca_key_left.stat.exists) and inventory_hostname in groups['ca_server']
+  when: inventory_hostname in groups['ca_server'] and (ca_password_root_left.stat.exists or ca_key_left.stat.exists)
   changed_when: true
   tags:
     - conf

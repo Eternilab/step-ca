@@ -108,7 +108,7 @@ proxy_env:
 
 step_ca_structure:
   rootCA:
-    fqdn: "ca.{{ step_ca_domain }}"
+    fqdn: "ca.@{ step_ca_domain }@"
     organisation: "Ma Societe"
     locality: "Paris"
     province: "IDF"
@@ -119,11 +119,11 @@ step_ca_structure:
     # OKP: Ed25519
     keycurve: P-384
     certDuration: "87600h"
-    IssuingCertificateURL: "http://issuers.{{ step_ca_domain }}/root/{{ step_ca_domain }}-CA.der"
-    crlDistributionPoints: "http://crl.{{ step_ca_domain }}/root/crl"
+    IssuingCertificateURL: "http://issuers.@{ step_ca_domain }@/root/@{ step_ca_domain }@-CA.der"
+    crlDistributionPoints: "http://crl.@{ step_ca_domain }@/root/crl"
   subCA:
     certDuration: "43800h"
-    ocspFQDN: "http://ocsp.pki.{{ step_ca_domain }}"
+    ocspFQDN: "http://ocsp.pki.@{ step_ca_domain }@"
     instances:
       - name : "S1"
         organisation: "Ma Societe"
@@ -136,8 +136,8 @@ step_ca_structure:
         # match: ".*\\.example\\.com"
         min_key_size_rsa: 512
         extKeyUsage: serverAuth
-        IssuingCertificateURL: "http://issuers.{{ step_ca_domain }}/s1/{{ step_ca_domain }}-subCA.der"
-        crlDistributionPoints: "http://crl.{{ step_ca_domain }}/s1/crl"
+        IssuingCertificateURL: "http://issuers.@{ step_ca_domain }@/s1/@{ step_ca_domain }@-subCA.der"
+        crlDistributionPoints: "http://crl.@{ step_ca_domain }@/s1/crl"
         listen_port: 9100
         insecure_port: 8080
       - name : "C1"
@@ -151,7 +151,7 @@ step_ca_structure:
         # match: ".*\\.example\\.com"
         min_key_size_rsa: 512
         extKeyUsage: clientAuth
-        IssuingCertificateURL: "http://issuers.{{ step_ca_domain }}/c1/{{ step_ca_domain }}-subCA.der"
-        crlDistributionPoints: "http://crl.{{ step_ca_domain }}/c1/crl"
+        IssuingCertificateURL: "http://issuers.@{ step_ca_domain }@/c1/@{ step_ca_domain }@-subCA.der"
+        crlDistributionPoints: "http://crl.@{ step_ca_domain }@/c1/crl"
         listen_port: 9101
         insecure_port: 8081
