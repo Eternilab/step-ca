@@ -58,26 +58,26 @@
   tags:
     - conf
 
-- name: "Fix root CA private key ownership and rights"
+- name: "Check root CA private key ownership and rights"
   ansible.builtin.file:
     name: "{{ step_ca_root_dir }}/secrets/root_ca.key"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
     mode: '0400'
     state: file
-  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  when: not ansible_check_mode and (inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists)
   become: true
   tags:
     - conf
 
-- name: "Fix root CA public key/certificate ownership and rights"
+- name: "Check root CA public key/certificate ownership and rights"
   ansible.builtin.file:
     name: "{{ step_ca_root_dir }}/certs/root_ca.crt"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
     mode: '0400'
     state: file
-  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  when: not ansible_check_mode and (inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists)
   become: true
   tags:
     - conf

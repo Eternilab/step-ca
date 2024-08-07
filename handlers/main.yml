@@ -7,15 +7,17 @@
   ansible.builtin.service:
     name: "step-ca-{{ item.name }}"
     state: restarted
-  with_items: "{{ step_ca_structure.SubCA.instances }}"
+  with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
+  when: not ansible_check_mode
   become: true
 - name: "Reload step-ca"
   ansible.builtin.service:
     name: "step-ca-{{ item.name }}"
     state: reloaded
-  with_items: "{{ step_ca_structure.SubCA.instances }}"
+  with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
+  when: not ansible_check_mode
   become: true

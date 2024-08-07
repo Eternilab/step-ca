@@ -21,36 +21,6 @@
     - install
 
 ### Installation
-- name: "Install dependancies for step-ca (APT based)"
-  ansible.builtin.apt:
-    pkg: "{{ step_ca_debian_dep }}"
-    state: present
-    update_cache: true
-  become: true
-  when: ansible_pkg_mgr == 'apt' and (inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers'])
-  tags:
-    - install
-
-- name: "Be sure that Debian backports are present for source build"
-  ansible.builtin.apt_repository:
-    repo: "deb http://deb.debian.org/debian {{ ansible_distribution_release }}-backports main contrib non-free non-free-firmware"
-    state: present
-  become: true
-  when: ansible_pkg_mgr == 'apt' and inventory_hostname in groups['ca_servers']
-  tags:
-    - install
-
-- name: "Install golang from backports for source build"
-  ansible.builtin.apt:
-    name: "{{ step_ca_debian_dep_backports }}"
-    state: present
-    default_release: bookworm-backports
-    update_cache: true
-  become: true
-  when: ansible_pkg_mgr == 'apt' and inventory_hostname in groups['ca_servers']
-  tags:
-    - install
-
 - name: "Compile and install using source tarball from Small Steps adding PKCS#11 support"
   ansible.builtin.import_tasks: manual.yml
   when: step_ca_install_mode == 'manual' and inventory_hostname in groups['ca_servers']
@@ -115,14 +85,14 @@
     - conf
   # when: ca_servers222
 
-- name: "Check service {{ item.name }} is enable"
+- name: "Check step-ca services are enable"
   ansible.builtin.service:
     name: "step-ca-{{ item.name }}.service"
     enabled: yes
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
-  when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
+  when: not ansible_check_mode and (inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers'])
   become: true
   tags:
     - conf
@@ -225,14 +195,14 @@
   tags:
     - conf
 
-- name: "Check step-ca {{ item.name }} service is started"
+- name: "Check step-ca services are started"
   ansible.builtin.service:
     name: "step-ca-{{ item.name }}.service"
     state: started
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
-  when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
+  when: not ansible_check_mode and (inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers'])
   become: true
   tags:
     - conf

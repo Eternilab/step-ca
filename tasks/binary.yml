@@ -72,7 +72,7 @@
     # todo : check mode
     remote_src: true
   become: true
-  when: not installed.stat.exists
+  when: not ansible_check_mode and not installed.stat.exists
   ignore_errors: "{{ ansible_check_mode }}"
   tags:
     - install

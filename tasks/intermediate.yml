@@ -66,28 +66,28 @@
   tags:
     - conf
 
-- name: "Fix intermediate {{ item.name }} CA instance private key ownership and rights"
+- name: "Check intermediate {{ item.name }} CA instance private key ownership and rights"
   ansible.builtin.file:
     name: "{{ step_ca_root_dir }}/secrets/{{ item.name }}/intermediate_ca.key"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
     mode: '0400'
     state: file
-  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  when: not ansible_check_mode and (inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists)
   become: true
   notify:
     - "Reload step-ca"
   tags:
     - conf
 
-- name: "Fix intermediate {{ item.name }} CA instance public key/certificate ownership and rights"
+- name: "Check intermediate {{ item.name }} CA instance public key/certificate ownership and rights"
   ansible.builtin.file:
     name: "{{ step_ca_root_dir }}/certs/{{ item.name }}/intermediate_ca.crt"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
     mode: '0400'
     state: file
-  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  when: not ansible_check_mode and (inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists)
   become: true
   notify:
     - "Reload step-ca"
