@@ -13,7 +13,7 @@ Architecture : amd64
 
 Vous devez définir 3 groupes dans votre inventaire :
 ````{verbatim}
-[ca_servers]
+[ca_server]
 ca.eternilab.com
 
 [ra_servers]
@@ -22,7 +22,7 @@ ra.eternilab.com
 [va_servers]
 va.eternilab.com
 ````
-Le groupe ````ca_servers```` contient les machines qui répondront aux demandes de signature. Ce sont celles qui ont un HSM connecté (via un port USB par exemple).
+Le groupe ````ca_server```` contient la machine qui répondra aux demandes de signature. Elle peut éventuellement avoir un HSM connecté (via un port USB par exemple) auquel cas la vairalbe step_ca_yubihsm devra être configurée a True.
 
 Le groupe ````ra_servers```` contient les machines qui répondront frontalement aux requêtes ACME pour les clients souhaitant une signature d'une requête de certificat.
 
@@ -36,13 +36,11 @@ Les variables "Requises" nécessitent d'être définies dans l'environnement qui
 
 | Variable                     | Requise | Valeur par défaut                                                                                                                      | Choix                                  | Commentaires                                                                                           |
 |------------------------------|---------|----------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------|--------------------------------------------------------------------------------------------------------|
-| step_ca_tmp_dir              | non     | /tmp                                                                                                                                   | string                                 |  |
-| step_ca_version              | non     | 0.26.1                                                                                                                                 | version                                |  |
+| step_ca_tmp_dir              | non     | /tmp                                                                                                                                   | string                                 | Dossier utilisé pour télécharger les fichiers temporaires |
+| step_ca_version              | non     | 0.27.2                                                                                                                                 | version                                |  |
 | step_ca_arch                 | non     | amd64                                                                                                                                  | amd64, 383, arm64, armv7, armv6, armv5 | Architecture Matérielle du serveur Step-CA |
-| step_ca_install_mode         | non     | manual                                                                                                                                 | manual, binary, debian                 | De quelle façon installer Step-CA |
+| step_ca_install_mode         | non     | debian                                                                                                                                 | manual, binary, debian                 | De quelle façon installer Step-CA |
 | step_ca_bin_file             | non     | /usr/local/bin/step-ca                                                                                                                 | path                                   | Fichier cible de l'installation pour le binaire|
-| step_ca_systemd_svc_file     | non     | /etc/systemd/system/step-ca.service                                                                                                    | path                                   | Fichier cible de l'installation pour le service |
-| step_ca_pid_file             | non     | /run/step_ca.pid                                                                                                                       | path                                   | Fichier cible de l'installation pour la tarball |
 | step_ca_tarball_manual       | non     | step-ca_linux_{{ step_ca_version }}.tar.gz                                                                                             | nom de fichier                         | En mode d'installation manuel, nom de fichier cible du téléchargement |
 | step_ca_url_manual           | non     | https://github.com/smallstep/certificates/archive/refs/tags/v{{ step_ca_version }}.tar.gz                                              | url                                    | En mode d'installation manuel, URL à partir de la quelle télécharger la tarball source |
 | step_ca_tarball_binary       | non     | step-ca_linux_{{ step_ca_version }}_{{ step_ca_arch }}.tar.gz                                                                          | nom de fichier                         | En mode d'installation avec le binaire, nom de fichier cible du téléchargement |
@@ -130,7 +128,7 @@ Pour l'exemple du FQDN ci-dessus, ```crl.example.com/crl``` et ```crl.example.co
 <li>FQDN du reverse proxy frontal, exposé publiquement pour distribuer des certificats racines et intermédiaires (Authority Information Access - CA Issuers) :
 
 ```
-dist.example.com
+issuers.example.com
 ```
 </li>
 </ul>
@@ -177,7 +175,7 @@ Exemple de playbook intégrant ce rôle
 ````{verbatim}
 ### PKI/IGC
 - hosts:
-    - ca_servers
+    - ca_server
     - ra_servers
   roles:
     - step-ca

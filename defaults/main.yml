@@ -30,8 +30,6 @@ step_ca_group: step
 
 # Install files targets
 step_ca_bin_file: /usr/local/bin/step-ca
-step_ca_systemd_svc_file: /etc/systemd/system/step-ca.service
-step_ca_pid_file: /run/step_ca.pid
 
 # Debian dependencies
 step_ca_debian_dep:
@@ -69,8 +67,6 @@ step_ca_url_binary: https://github.com/smallstep/certificates/releases/download/
 # URL to download Debian package from
 step_ca_url_deb: https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/step-ca_{{ step_ca_arch }}.deb
 
-step_ca_url_systemd_svc_file: https://raw.githubusercontent.com/smallstep/certificates/v{{ step_ca_version }}/systemd/step-ca.service
-
 step_ca_apt_state: present
 
 #####
@@ -102,7 +98,7 @@ proxy_env:
 #   ftp_proxy: http://proxy.example.com:3128
 
 # Default administrator name/email, used to create the first Json Web Key for admin acces (JWK provider)) to the step-ca service.
-# step_ca_email: "admin@example.com"
+# step_ca_admin_jwk_name: "admin@example.com"
 
 # Domain name to sign certificates for
 # Used in templating for leaf certificates :
@@ -112,7 +108,7 @@ proxy_env:
 
 step_ca_structure:
   rootCA:
-    fqdn: "ca.pki.exemple.com"
+    fqdn: "ca.{{ step_ca_domain }}"
     organisation: "Ma Societe"
     locality: "Paris"
     province: "IDF"
@@ -123,11 +119,11 @@ step_ca_structure:
     # OKP: Ed25519
     keycurve: P-384
     certDuration: "87600h"
-    IssuingCertificateURL: "http://issuers.pki.example.com/root/example.com-CA.der"
-    crlDistributionPoints: "http://crl.pki.example.com/root/crl"
+    IssuingCertificateURL: "http://issuers.{{ step_ca_domain }}/root/{{ step_ca_domain }}-CA.der"
+    crlDistributionPoints: "http://crl.{{ step_ca_domain }}/root/crl"
   subCA:
     certDuration: "43800h"
-    ocspFQDN: "http://ocsp.pki.example.com"
+    ocspFQDN: "http://ocsp.pki.{{ step_ca_domain }}"
     instances:
       - name : "S1"
         organisation: "Ma Societe"
@@ -140,8 +136,8 @@ step_ca_structure:
         # match: ".*\\.example\\.com"
         min_key_size_rsa: 512
         extKeyUsage: serverAuth
-        IssuingCertificateURL: "http://issuers.pki.example.com/s1/example.com-subCA.der"
-        crlDistributionPoints: "http://crl.pki.example.com/s1/crl"
+        IssuingCertificateURL: "http://issuers.{{ step_ca_domain }}/s1/{{ step_ca_domain }}-subCA.der"
+        crlDistributionPoints: "http://crl.{{ step_ca_domain }}/s1/crl"
         listen_port: 9100
         insecure_port: 8080
       - name : "C1"
@@ -155,7 +151,7 @@ step_ca_structure:
         # match: ".*\\.example\\.com"
         min_key_size_rsa: 512
         extKeyUsage: clientAuth
-        IssuingCertificateURL: "http://issuers.pki.example.com/c1/example.com-subCA.der"
-        crlDistributionPoints: "http://crl.pki.example.com/c1/crl"
+        IssuingCertificateURL: "http://issuers.{{ step_ca_domain }}/c1/{{ step_ca_domain }}-subCA.der"
+        crlDistributionPoints: "http://crl.{{ step_ca_domain }}/c1/crl"
         listen_port: 9101
         insecure_port: 8081

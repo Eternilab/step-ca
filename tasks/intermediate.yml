@@ -5,7 +5,7 @@
   ansible.builtin.stat:
     name: "{{ step_ca_root_dir }}/certs/{{ item.name }}/intermediate_ca.crt"
   register: ca_pub_key
-  when: inventory_hostname in groups['ca_servers']
+  when: inventory_hostname in groups['ca_server']
   become: true
   tags:
     - conf
@@ -13,7 +13,7 @@
 - name: "Generate random password for {{ item.name }} intermediate CA instance if none set"
   ansible.builtin.set_fact:
     intermediate_ca_password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_letters', 'digits', 'punctuation']) }}"
-  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  when: inventory_hostname in groups['ca_server'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
   no_log: true
   tags:
     - conf
@@ -25,7 +25,7 @@
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
     mode: '0400'
-  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  when: inventory_hostname in groups['ca_server'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
   no_log: true
   become: true
   notify:
@@ -58,7 +58,7 @@
       - "{{ item.name }} Intermediate CA"
       - "{{ step_ca_root_dir }}/certs/{{ item.name }}/intermediate_ca.crt"
       - "{{ step_ca_root_dir }}/secrets/{{ item.name }}/intermediate_ca.key"
-  when: inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  when: inventory_hostname in groups['ca_server'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
   become: true
   changed_when: true
   notify:
@@ -73,7 +73,7 @@
     group: "{{ step_ca_group }}"
     mode: '0400'
     state: file
-  when: not ansible_check_mode and (inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists)
+  when: not ansible_check_mode and (inventory_hostname in groups['ca_server'] and not step_ca_yubihsm and not ca_pub_key.stat.exists)
   become: true
   notify:
     - "Reload step-ca"
@@ -87,7 +87,7 @@
     group: "{{ step_ca_group }}"
     mode: '0400'
     state: file
-  when: not ansible_check_mode and (inventory_hostname in groups['ca_servers'] and not step_ca_yubihsm and not ca_pub_key.stat.exists)
+  when: not ansible_check_mode and (inventory_hostname in groups['ca_server'] and not step_ca_yubihsm and not ca_pub_key.stat.exists)
   become: true
   notify:
     - "Reload step-ca"

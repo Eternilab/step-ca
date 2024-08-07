@@ -23,7 +23,7 @@
 ### Installation
 - name: "Compile and install using source tarball from Small Steps adding PKCS#11 support"
   ansible.builtin.import_tasks: manual.yml
-  when: step_ca_install_mode == 'manual' and inventory_hostname in groups['ca_servers']
+  when: step_ca_install_mode == 'manual' and inventory_hostname in groups['ca_server']
 
 - name: "Install using binary tarball from Small Steps"
   ansible.builtin.import_tasks: binary.yml
@@ -45,7 +45,7 @@
   loop: "{{ step_ca_dirlist | product(step_ca_structure.subCA.instances) }}"
   loop_control:
     label: "{{ step_ca_root_dir }}/{{ item[0] }}/{{ item[1].name }}"
-  when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
+  when: inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']
   become: true
   tags:
     - conf
@@ -62,7 +62,7 @@
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
-  when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
+  when: inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']
   become: true
   notify:
     - "Reload step-ca"
@@ -76,14 +76,14 @@
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
-  when: inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers']
+  when: inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']
   become: true
   notify:
     - Systemd daemon-reload
     - "Restart step-ca"
   tags:
     - conf
-  # when: ca_servers222
+  # when: ca_server222
 
 - name: "Check step-ca services are enable"
   ansible.builtin.service:
@@ -92,7 +92,7 @@
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
-  when: not ansible_check_mode and (inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers'])
+  when: not ansible_check_mode and (inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers'])
   become: true
   tags:
     - conf
@@ -110,7 +110,7 @@
   loop_control:
     label: "{{ item.name }} Intermediate CA"
   become: true
-  when: inventory_hostname in groups['ca_servers']
+  when: inventory_hostname in groups['ca_server']
   notify:
     - "Reload step-ca"
   tags:
@@ -129,7 +129,7 @@
   loop_control:
     label: "{{ item.name }} Intermediate CA"
   become: true
-  when: inventory_hostname in groups['ca_servers']
+  when: inventory_hostname in groups['ca_server']
   tags:
     - conf
 
@@ -143,7 +143,7 @@
     variable_start_string: '@{'
     variable_end_string: '}@'
   become: true
-  when: inventory_hostname in groups['ca_servers']
+  when: inventory_hostname in groups['ca_server']
   tags:
     - conf
 
@@ -152,7 +152,7 @@
 
 - name: "Configure root CA keys"
   ansible.builtin.import_tasks: root.yml
-  when: inventory_hostname in groups['ca_servers']
+  when: inventory_hostname in groups['ca_server']
   notify:
     - "Reload step-ca"
   tags:
@@ -172,7 +172,7 @@
     name: "{{ step_ca_root_dir}}/secrets/root_ca.key"
   register: ca_key_left
   become: true
-  when: inventory_hostname in groups['ca_servers']
+  when: inventory_hostname in groups['ca_server']
   changed_when: ca_key_left.stat.exists
   tags:
     - conf
@@ -182,7 +182,7 @@
     name: "{{ step_ca_root_dir }}/secrets/root_ca_password.txt"
   register: ca_password_root_left
   become: true
-  when: inventory_hostname in groups['ca_servers']
+  when: inventory_hostname in groups['ca_server']
   changed_when: ca_password_root_left.stat.exists
   tags:
     - conf
@@ -193,7 +193,7 @@
       !! -- Warning -- !!
       CA private key or password left in secret folder
       !! -- Warning -- !!
-  when: (ca_password_root_left.stat.exists or ca_key_left.stat.exists) and inventory_hostname in groups['ca_servers']
+  when: (ca_password_root_left.stat.exists or ca_key_left.stat.exists) and inventory_hostname in groups['ca_server']
   changed_when: true
   tags:
     - conf
@@ -205,7 +205,7 @@
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
-  when: not ansible_check_mode and (inventory_hostname in groups['ca_servers'] or inventory_hostname in groups['ra_servers'])
+  when: not ansible_check_mode and (inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers'])
   become: true
   tags:
     - conf

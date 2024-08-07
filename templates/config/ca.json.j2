@@ -1,5 +1,5 @@
 {
-{% if 'ca_servers' in group_names %}
+{% if 'ca_server' in group_names %}
 	"root": "{{ step_ca_root_dir }}/certs/root_ca.crt",
 	"federatedRoots": null,
 	"crt": "{{ step_ca_root_dir }}/certs/{{ item.name }}/intermediate_ca.crt",
@@ -19,7 +19,7 @@
 		"badgerFileLoadingMode": ""
 	},
 	"authority": {
-{% if 'ca_servers' in group_names %}
+{% if 'ca_server' in group_names %}
 		"provisioners": [
 			{
 				"type": "JWK",
@@ -93,7 +93,7 @@
 		"minVersion": 1.3,
 		"maxVersion": 1.3,
 		"renegotiation": false
-{% if 'ca_servers' in group_names %}
+{% if 'ca_server' in group_names %}
 	},
 	"commonName": "Step Online CA",
 	"crl": {
