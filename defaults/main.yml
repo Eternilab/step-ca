@@ -18,7 +18,11 @@ step_ca_arch: amd64
 # How to install step-ca
 # Can be any of :
 # manual, binary, debian
-step_ca_install_mode: manual
+# In manual, only ca_server will be installed in manual mode, ra_servers will be installed in debian mode
+# In binary, CA and RAs will be installed in binary mode
+# In debian, CA and RAs will be installed in debian mode
+# In case you are using a HSM (ex: YubiHSM) on your CA, you need to use manual mode, prebuild binaries lack HSM support.
+step_ca_install_mode: debian
 
 # User and group for step daemon
 step_ca_user: step
