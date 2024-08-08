@@ -49,7 +49,7 @@
 		],
 {% elif 'ra_servers' in group_names %}
 		"type": "stepcas",
-		"certificateAuthority": "https://ca.{{ step_ca_domain }}:{{ item.listen_port }}",
+		"certificateAuthority": "https://{{ step_ca_structure.rootCA.fqdn }}:{{ item.listen_port }}",
 		"certificateAuthorityFingerprint": "TODO",
 		"certificateIssuer": {
 			"type" : "jwk",

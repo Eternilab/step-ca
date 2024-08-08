@@ -108,7 +108,7 @@ proxy_env:
 
 step_ca_structure:
   rootCA:
-    fqdn: "ca.@{ step_ca_domain }@"
+    fqdn: "ca.{{ step_ca_domain }}"
     organisation: "Ma Societe"
     locality: "Paris"
     province: "IDF"
