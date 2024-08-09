@@ -11,7 +11,7 @@ then
     echo "Adding ${i%%.pub.json} JWK provisionner from $WORKDIR/{{ step_ca_jwk_RAs_dir }} directory"
     step ca provisioner add ${i%%.pub.json} \
          --ca-config $WORKDIR/ca_generated.json \
-         --ca-url "{{ step_ca_structure.rootCA.fqdn }}" \
+         --ca-url "{{ step_ca_structure.rootCA.fqdn | default(groups['ca_server'][0]) }}" \
          --root $STEPPATH/certs/root_ca.crt \
          --type JWK \
          --public-key $i \

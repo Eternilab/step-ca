@@ -8,7 +8,11 @@
 	"address": "{{ ansible_default_ipv4.address }}:{{ item.listen_port }}",
 	"insecureAddress": "{{ ansible_default_ipv4.address }}:{{ item.insecure_port }}",
 	"dnsNames": [
+{% if 'ca_server' in group_names %}
+		"{{ step_ca_structure.rootCA.fqdn | default(groups['ca_server'][0]) }}"
+{% elif 'ra_servers' in group_names %}
 		"{{ ansible_host }}"
+{% endif %}
 	],
 	"logger": {
 		"format": "text"
@@ -24,7 +28,7 @@
 		],
 {% elif 'ra_servers' in group_names %}
 		"type": "stepcas",
-		"certificateAuthority": "https://{{ step_ca_structure.rootCA.fqdn }}:{{ item.listen_port }}",
+		"certificateAuthority": "https://{{ step_ca_structure.rootCA.fqdn | default(groups['ca_server'][0]) }}:{{ item.listen_port }}",
 		"certificateAuthorityFingerprint": "TODO",
 		"certificateIssuer": {
 			"type" : "jwk",

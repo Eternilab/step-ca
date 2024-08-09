@@ -111,6 +111,7 @@ proxy_env:
 
 step_ca_structure:
   rootCA:
+# FQDN can optionnaly be defined, if not, the machine name in the inventory group ca_server will be used
     fqdn: "ca.{{ step_ca_domain }}"
     organisation: "Ma Societe"
     locality: "Paris"
