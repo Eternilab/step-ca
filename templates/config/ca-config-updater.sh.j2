@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-WORKDIR=$STEPPATH/config/$1
+WORKDIR="$STEPPATH/config/{{ item.name }}"
 cd $WORKDIR
 echo Building ca_generated.json from ca.json in $WORKDIR
 cp ca.json ca_generated.json
@@ -11,7 +11,7 @@ then
     echo "Adding ${i%%.pub.json} JWK provisionner from $WORKDIR/{{ step_ca_jwk_RAs_dir }} directory"
     step ca provisioner add ${i%%.pub.json} \
          --ca-config $WORKDIR/ca_generated.json \
-         --ca-url "IGNORED" \
+         --ca-url "{{ step_ca_structure.rootCA.fqdn }}" \
          --root $STEPPATH/certs/root_ca.crt \
          --type JWK \
          --public-key $i \
@@ -22,7 +22,7 @@ then
          --x509-min-dur "{{ item.minTLSCertDuration }}" \
          --x509-max-dur "{{ item.maxTLSCertDuration }}" \
          --x509-default-dur "{{ item.defaultTLSCertDuration }}" \
-         --x509-template $STEPPATH/templates/certs/x509/$1/leaf.tpl
+         --x509-template "$STEPPATH/templates/certs/x509/{{ item.name }}/leaf.tpl"
   done
 else
   echo "No JWK provisionner *.pub.json found in $WORKDIR/{{ step_ca_jwk_RAs_dir }} directory"
