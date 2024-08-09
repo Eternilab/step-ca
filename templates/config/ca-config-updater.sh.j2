@@ -19,9 +19,9 @@ then
          --disable-renewal=false \
          --allow-renewal-after-expiry=false \
          --disable-smallstep-extensions=false \
-         --x509-min-dur "1200h" \
-         --x509-max-dur "1200h" \
-         --x509-default-dur "1200h" \
+         --x509-min-dur "{{ item.minTLSCertDuration }}" \
+         --x509-max-dur "{{ item.maxTLSCertDuration }}" \
+         --x509-default-dur "{{ item.defaultTLSCertDuration }}" \
          --x509-template $STEPPATH/templates/certs/x509/$1/leaf.tpl
   done
 else
