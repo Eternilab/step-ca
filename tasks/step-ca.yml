@@ -149,6 +149,36 @@
   tags:
     - conf
 
+- name: "The folder ({{ step_ca_jwk_RAs_dir }}) used to store the JWK publik keys for the RAs is present"
+  ansible.builtin.file:
+    name: "{{ step_ca_root_dir }}/config/{{ item.name }}/{{ step_ca_jwk_RAs_dir }}"
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_group }}"
+    mode: '0700'
+    recurse: false
+    state: directory
+  with_items: "{{ step_ca_structure.subCA.instances }}"
+  loop_control:
+    label: "{{ item.name }} Intermediate CA"
+  when: inventory_hostname in groups['ca_server']
+  become: true
+  tags:
+    - conf
+
+- name: "The ca-config-updater.sh Bash script used to inject the RAs JWK public key as provisionner into the running configuration is present"
+  ansible.builtin.template:
+    src: "config/ca-config-updater.sh.j2"
+    dest: "{{ step_ca_root_dir }}/config/ca-config-updater.sh"
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_group }}"
+    mode: '0700'
+  when: inventory_hostname in groups['ca_server']
+  become: true
+  notify:
+    - "Reload step-ca"
+  tags:
+    - conf
+
 ###########################
 ### Configuration : systemd service
 

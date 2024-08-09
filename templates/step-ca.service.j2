@@ -18,11 +18,12 @@ Group=step
 Environment=STEPPATH=/etc/step-ca
 WorkingDirectory=/etc/step-ca
 {% if 'ca_server' in group_names %}
-ExecStart=/usr/bin/step-ca config/{{ item.name }}/ca.json --password-file secrets/{{ item.name }}/intermediate_ca_password.txt
+ExecStartPre=/etc/step-ca/config/ca-config-updater.sh {{ item.name }}
+ExecStart=/usr/bin/step-ca config/{{ item.name }}/ca_generated.json --password-file secrets/{{ item.name }}/intermediate_ca_password.txt
 {% elif 'ra_servers' in group_names %}
 ExecStart=/usr/bin/step-ca config/{{ item.name }}/ca.json
 {% endif %}
-ExecReload=/bin/kill --signal HUP $MAINPID
+ExecReload=/etc/step-ca/config/ca-config-updater.sh C1 ; /bin/kill --signal HUP $MAINPID
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=30
@@ -58,7 +59,7 @@ PrivateDevices=true
 SystemCallFilter=@system-service
 SystemCallArchitectures=native
 MemoryDenyWriteExecute=true
-ReadWriteDirectories=/etc/step-ca/db/{{ item.name }}
+ReadWriteDirectories=/etc/step-ca/db/{{ item.name }} /etc/step-ca/config/{{ item.name }}
 
 [Install]
 WantedBy=multi-user.target

@@ -21,31 +21,6 @@
 	"authority": {
 {% if 'ca_server' in group_names %}
 		"provisioners": [
-			{
-				"type": "JWK",
-				"name": "{{ step_ca_admin_jwk_name }}",
-				"key": {
-					"use": "sig",
-					"kty": "OKP",
-					"kid": "TODO",
-					"crv": "Ed25519",
-					"alg": "EdDSA",
-					"x": "QpBaMgq-liKM0bWuvRrhwebzaxDTgziSJxf9ryz5DDY"
-				},
-				"encryptedKey": "TODO",
-				"claims": {
-					"minTLSCertDuration": "{{ item.minTLSCertDuration }}",
-					"maxTLSCertDuration": "{{ item.maxTLSCertDuration }}",
-					"defaultTLSCertDuration": "{{ item.defaultTLSCertDuration }}",
-					"enableSSHCA": false,
-					"disableRenewal": false
-				},
-				"options": {
-					"x509": {
-						"templateFile": "{{ step_ca_root_dir }}/templates/certs/x509/{{ item.name }}/leaf.tpl"
-					}
-				}
-			}
 		],
 {% elif 'ra_servers' in group_names %}
 		"type": "stepcas",

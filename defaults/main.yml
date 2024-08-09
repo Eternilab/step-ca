@@ -73,6 +73,7 @@ step_ca_apt_state: present
 ### Default user variables
 #####
 
+# Default configuration directories used by step-ca
 step_ca_dirlist:
   - certs
   - config
@@ -80,6 +81,8 @@ step_ca_dirlist:
   - secrets
   - templates/certs/x509
 
+# Directory on the CA used to store the JWK public keys from the RAs for each subCA
+step_ca_jwk_RAs_dir: jwk_RAs
 
 # This will use a YubiHSM to store the intermediate CAs, otherwise it'll be stored on disk.
 # true  -> YubiHSM
