@@ -66,7 +66,7 @@ La variable "step_ca_structure" définit la structure de l'IGC. Chacune de ses v
 | Variable                   | Choix                    | Commentaires                                                          |
 |----------------------------|--------------------------|-----------------------------------------------------------------------|
 | rootCA                     |                          | Clé qui prendra pour valeur les variables relatives à la CA racine    |
-|   fqdn                     |                          | FQDN du serveur StepCAS-CA                                            |
+|   fqdn                     |                          | Pour RAs : adresse de la CA & pour CA : validation SNI TLS (optionnel)|
 | subCA                      |                          | Clé qui prendra pour valeur chacune des clés des CA intermédiaires    |
 |   instances                |                          | Liste des instances de subCA                                          |
 |     organisation           | String                   | Nom de la société détentrice du certificat                            |

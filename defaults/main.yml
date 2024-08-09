@@ -112,7 +112,8 @@ proxy_env:
 step_ca_structure:
   rootCA:
 # FQDN can optionnaly be defined, if not, the machine name in the inventory group ca_server will be used
-    fqdn: "ca.{{ step_ca_domain }}"
+# It is used on the RAs as an address to contact the CA host and on the CA to validate the TLS SNI send by the TLS clients
+#    fqdn: "ca.{{ step_ca_domain }}"
     organisation: "Ma Societe"
     locality: "Paris"
     province: "IDF"
