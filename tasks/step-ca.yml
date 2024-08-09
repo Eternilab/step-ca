@@ -2,7 +2,7 @@
 ###########################
 ### Pre-Installation
 
-- name: "Create step group as a system group for daemon usage"
+- name: "Step group exists as a system group for daemon usage"
   ansible.builtin.group:
     name: "{{ step_ca_group }}"
     state: present
@@ -11,7 +11,7 @@
   tags:
     - install
 
-- name: "Create step user as a system user for daemon usage"
+- name: "Step user exists as a system user for daemon usage"
   ansible.builtin.user:
     name: "{{ step_ca_user }}"
     comment: "step and step-ca daemon account"
@@ -37,8 +37,10 @@
   ansible.builtin.import_tasks: debian.yml
   when: step_ca_install_mode == 'debian' or (step_ca_install_mode == 'manual' and inventory_hostname in groups['ra_servers'])
 
+###########################
 ### Pre-Configuration
-- name: "Be sure conf directories exist in {{ step_ca_root_dir }}"
+
+- name: "Configuration directories are present in {{ step_ca_root_dir }}"
   ansible.builtin.file:
     name: "{{ step_ca_root_dir }}/{{ item[0] }}/{{ item[1].name }}"
     owner: "{{ step_ca_user }}"
@@ -57,7 +59,7 @@
 ###########################
 ### Configuration : certificate templates
 
-- name: "Be sure step-ca root CA template is configured"
+- name: "Step-ca root CA template are configured"
   ansible.builtin.template:
     src: "templates/certs/x509/root.tpl.j2"
     dest: "{{ step_ca_root_dir }}/templates/certs/x509/root.tpl"
@@ -71,7 +73,7 @@
   tags:
     - conf
 
-- name: "Be sure step-ca intermediate CA template is configured"
+- name: "Step-ca intermediate CA template are configured"
   ansible.builtin.template:
     src: "templates/certs/x509/intermediate.tpl.j2"
     dest: "{{ step_ca_root_dir }}/templates/certs/x509/{{ item.name }}/intermediate.tpl"
@@ -88,7 +90,7 @@
   tags:
     - conf
 
-- name: "Be sure step-ca leaf templates are configured"
+- name: "Step-ca leaf templates are configured"
   ansible.builtin.template:
     src: "templates/certs/x509/leaf.tpl.j2"
     dest: "{{ step_ca_root_dir }}/templates/certs/x509/{{ item.name }}/leaf.tpl"
@@ -130,7 +132,7 @@
 ###########################
 ### Configuration : step-ca
 
-- name: "Be sure step-ca is configured"
+- name: "Step-ca configuration file is present"
   ansible.builtin.template:
     src: "config/ca.json.j2"
     dest: "{{ step_ca_root_dir }}/config/{{ item.name }}/ca.json"
@@ -150,7 +152,7 @@
 ###########################
 ### Configuration : systemd service
 
-- name: "Systemd service file installed"
+- name: "Systemd service file is installed"
   ansible.builtin.template:
     src: "step-ca.service.j2"
     dest: "/etc/systemd/system/step-ca-{{ item.name }}.service"
@@ -165,7 +167,7 @@
   tags:
     - conf
 
-- name: "Check step-ca services are enable"
+- name: "Step-ca services is enable"
   ansible.builtin.service:
     name: "step-ca-{{ item.name }}.service"
     enabled: yes
@@ -180,7 +182,7 @@
 ###########################
 ### Services started
 
-- name: "Check step-ca services are started"
+- name: "Step-ca services is started"
   ansible.builtin.service:
     name: "step-ca-{{ item.name }}.service"
     state: started
@@ -195,7 +197,7 @@
 ###########################
 ### Remaining secrets from root CA
 
-- name: "Check there is no root CA private key left in secret folder"
+- name: "There is no root CA private key left in secret folder"
   ansible.builtin.stat:
     name: "{{ step_ca_root_dir}}/secrets/root_ca.key"
   register: ca_key_left
@@ -205,7 +207,7 @@
   tags:
     - conf
 
-- name: "Check there is no root CA private key password left in secret folder"
+- name: "There is no root CA private key password left in secret folder"
   ansible.builtin.stat:
     name: "{{ step_ca_root_dir }}/secrets/root_ca_password.txt"
   register: ca_password_root_left
