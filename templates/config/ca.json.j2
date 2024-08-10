@@ -72,14 +72,16 @@
 		"minVersion": 1.3,
 		"maxVersion": 1.3,
 		"renegotiation": false
-{% if 'ca_server' in group_names %}
 	},
-	"commonName": "Step Online CA",
+{% if 'ca_server' in group_names %}
+	"commonName": "{{ item.organisation }} {{ item.name }} Certification Authority service",
 	"crl": {
 		"enabled": true,
 		"generateOnRevoke": true,
 		"cacheDuration": "24h0m0s",
-		"idpURL": "http://crl.pki.example.com/s1/crl"
-{% endif %}
+		"idpURL": "{{ item.crlDistributionPoints }}"
 	}
+{% elif 'ra_servers' in group_names %}
+	"commonName": "{{ item.organisation }} {{ item.name }} Registration Authority service"
+{% endif %}
 }
