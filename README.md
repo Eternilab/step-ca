@@ -206,6 +206,9 @@ See license.md
 Author Information
 ------------------
 
+Jérôme MAURIN <jerome.maurin@eternilab.com>
 Sylvain LEROY <sylvain.leroy@eternilab.com>
+Dionys COLSON <dionys.colson@eternilab.com>
+Maxime BREL <maxime.brel@eternilab.com>
 
 https://www.eternilab.com
