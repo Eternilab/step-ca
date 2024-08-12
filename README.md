@@ -46,14 +46,7 @@ Les variables "Requises" nécessitent d'être définies dans l'environnement qui
 | step_ca_tarball_binary       | non     | step-ca_linux_{{ step_ca_version }}_{{ step_ca_arch }}.tar.gz                                                                          | nom de fichier                         | En mode d'installation avec le binaire, nom de fichier cible du téléchargement |
 | step_ca_url_binary           | non     | https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/{{ step_ca_tarball }}                               | url                                    | En mode d'installation avec le binaire, URL à partir de la quelle télécharger la tarball source |
 | step_ca_url_deb              | non     | https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/step-ca_{{ step_ca_arch }}.deb                      | url                                    | En mode d'installation par debian, URL à partir de la quelle télécharger le paquet .deb |
-| step_ca_url_systemd_svc_file | non     | https://raw.githubusercontent.com/smallstep/certificates/v{{ step_ca_version }}/systemd/step-ca.service                                | url                                    | En mode d'installation par debian, URL à partir de la quelle télécharger le service step-ca |
-| step_ca_apt_state            | non     | present                                                                                                                                | present, absent, latest                | Installer / Désinstaller / Installer la dernière version de Step-CA|
-| step_ca_server_listen_port   | non     | 9100                                                                                                                                   | port                                   | |
-| step_ca_server_insecure_port | non     | 8080                                                                                                                                   | port                                   | |
-| step_ca_client_listen_port   | non     | 9110                                                                                                                                   | port                                   | |
-| step_ca_filelist             | non     | - config/ca_client.json<br> - config/ca_server.json<br>                                                                                | liste de noms de fichiers              | |
-| step_ca_ca_templates         | non     | - templates/certs/x509/root.tpl<br> - templates/certs/x509/intermediate_client.tpl<br> - templates/certs/x509/intermediate_server.tpl  | liste de fichiers templates            | |
-| step_ca_ra_templates         | non     | - templates/certs/x509/leaf_client.tpl<br> - templates/certs/x509/leaf_server.tpl                                                      | liste de fichiers templates            | |
+| step_ca_apt_state            | non     | present                                                                                                                                | latest, present, absent                | Installer la dernière version de / Désinstaller / Installer Step-CA|
 | step_ca_dirlist              | non     | - certs<br> - config<br> - db_server<br> - db_client<br> - secrets<br> - templates                                                     | liste de dossiers                      | |
 | step_ca_yubihsm              | non     | false                                                                                                                                  | booléen                                | Stocke les CA intermédiaires sur une YubiHSM (True) ou sur le disque (False). |
 | step_ca_root_dir             | non     | /etc/step-ca                                                                                                                           | dossier                                | |
@@ -80,6 +73,8 @@ La variable "step_ca_structure" définit la structure de l'IGC. Chacune de ses v
 |     extKeyUsage            | serverAuth, clientAuth   | Usage cible de la clé. Doit être l'un et seulement un des choix       |
 |     IssuingCertificateURL  | URL de certificat        | URL sur laquel récupérer le certificat                                |
 |     crlDistributionPoints  | URL de CRL               | URL sur lequel récupérer la liste de révocation des certificats       |
+|     listen_port            | port                     | Port sur lequel écoute step-ca en TLS pour RA et CA                   |
+|     insecure_port          | port                     | Port sur lequel écoute step-ca en clair pour servir la CRL sur la CA  |
 
 
 Gestion des DNS
