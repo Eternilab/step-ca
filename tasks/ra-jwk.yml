@@ -1,0 +1,123 @@
+###########################
+### Configuration des clefs JWK des RAs
+
+- name: "JWK public key used to connect to the {{ item.name }} CA exists on RA"
+  ansible.builtin.stat:
+    name: "{{ step_ca_root_dir }}/certs/{{ item.name }}/ra.pub.json"
+  register: ca_pub_key
+  when: inventory_hostname in groups['ra_servers']
+  become: true
+  tags:
+    - conf
+
+- name: "PEM private key used to connect to the {{ item.name }} CA exists on RA"
+  ansible.builtin.stat:
+    name: "{{ step_ca_root_dir }}/secrets/{{ item.name }}/ra.pem"
+  register: ca_priv_key
+  when: inventory_hostname in groups['ra_servers']
+  become: true
+  tags:
+    - conf
+
+- name: "Generate random password for JWK private key used to connect to the {{ item.name }} CA"
+  ansible.builtin.set_fact:
+    ra_jwk_password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_letters', 'digits', 'punctuation']) }}"
+  when: inventory_hostname in groups['ra_servers'] and (not ca_pub_key.stat.exists or not ca_priv_key.stat.exists)
+  no_log: true
+  tags:
+    - conf
+
+- name: "Create password file for JWK private key used to connect to the {{ item.name }} CA"
+  ansible.builtin.template:
+    src: "secrets/ra_jwk_password.txt.j2"
+    dest: "{{ step_ca_root_dir }}/secrets/{{ item.name }}/ra_jwk_password.txt"
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_group }}"
+    mode: '0400'
+  when: inventory_hostname in groups['ra_servers'] and (not ca_pub_key.stat.exists or not ca_priv_key.stat.exists)
+  no_log: true
+  become: true
+  notify:
+    - "Reload step-ca"
+  tags:
+    - conf
+
+- name: "Create JWK pair used to connect to the {{ item.name }} CA"
+  ansible.builtin.command:
+    argv:
+      - step
+      - crypto
+      - jwk
+      - create
+      - "{{ step_ca_root_dir }}/certs/{{ item.name }}/ra.pub.json"
+      - "{{ step_ca_root_dir }}/secrets/{{ item.name }}/ra.json"
+      - --password-file
+      - "{{ step_ca_root_dir }}/secrets/{{ item.name }}/ra_jwk_password.txt"
+      - --force
+  when: inventory_hostname in groups['ra_servers'] and (not ca_pub_key.stat.exists or not ca_priv_key.stat.exists)
+  become: true
+  changed_when: true
+  notify:
+    - "Reload step-ca"
+  tags:
+    - conf
+
+- name: "Export JWK private encrypted key to PEM format"
+  ansible.builtin.shell:
+    argv:
+      - step
+      - crypto
+      - key
+      - format
+      - --pkcs8
+      - --password-file
+      - "{{ step_ca_root_dir }}/secrets/{{ item.name }}/ra_jwk_password.txt"
+      - "{{ step_ca_root_dir }}/secrets/{{ item.name }}/ra.json"
+      - --out
+      - "{{ step_ca_root_dir }}/secrets/{{ item.name }}/ra.pem"
+  when: inventory_hostname in groups['ra_servers'] and (not ca_pub_key.stat.exists or not ca_priv_key.stat.exists)
+  become: true
+  changed_when: true
+  notify:
+    - "Reload step-ca"
+  tags:
+    - conf
+
+- name: "Ownership and rights for JWK public key used to connect to the {{ item.name }} CA"
+  ansible.builtin.file:
+    name: "{{ step_ca_root_dir }}/certs/{{ item.name }}/ra.pub.json"
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_group }}"
+    mode: '0400'
+    state: file
+  when: inventory_hostname in groups['ra_servers'] and (not ansible_check_mode or (ansible_check_mode and ca_pub_key.stat.exists))
+  become: true
+  notify:
+    - "Reload step-ca"
+  tags:
+    - conf
+
+- name: "Ownership and rights for PEM private encrypted key used to connect to the {{ item.name }} CA"
+  ansible.builtin.file:
+    name: "{{ step_ca_root_dir }}/secrets/{{ item.name }}/ra.pem"
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_group }}"
+    mode: '0400'
+    state: file
+  when: inventory_hostname in groups['ra_servers'] and (not ansible_check_mode or (ansible_check_mode and ca_priv_key.stat.exists))
+  become: true
+  notify:
+    - "Reload step-ca"
+  tags:
+    - conf
+
+- name: "Import JWK public key to Ansible control node"
+  ansible.builtin.fetch:
+    src: "{{ step_ca_root_dir }}/certs/{{ item.name }}/ra.pub.json"
+    dest: /tmp/step-ca-ras-jwks/{{ item.name }}/ra-{{ inventory_hostname }}.pub.json
+    flat: yes
+  become: true
+  when: inventory_hostname in groups['ra_servers'] and not ansible_check_mode
+  tags:
+    - conf
+

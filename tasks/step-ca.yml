@@ -110,7 +110,7 @@
     - conf
 
 ###########################
-### Configuration : root and intermediate CA certificates
+### Configuration : generate certificates and JWKs
 
 - name: "Root CA certificate and key"
   ansible.builtin.import_tasks: root.yml
@@ -129,8 +129,31 @@
   tags:
     - conf
 
+- name: "RA JWK public and private keys"
+  ansible.builtin.include_tasks: ra-jwk.yml
+  with_items:
+    "{{ step_ca_structure.subCA.instances }}"
+  loop_control:
+    label: "{{ item.name }} Intermediate CA"
+  tags:
+    - conf
+
 ###########################
 ### Configuration : step-ca
+
+- name: "Get the rootCA certificate fingerprint"
+  ansible.builtin.shell:
+    argv:
+      - step
+      - certificate
+      - fingerprint
+      - "{{ step_ca_root_dir }}/certs/root_ca.crt"
+  register: rootCA_fingerprint
+  when: inventory_hostname in groups['ca_server']
+  changed_when: false
+  become: true
+  tags:
+    - conf
 
 - name: "Step-ca configuration file is present"
   ansible.builtin.template:
@@ -149,7 +172,7 @@
   tags:
     - conf
 
-- name: "The folder ({{ step_ca_jwk_RAs_dir }}) used to store the JWK publik keys for the RAs is present"
+- name: "The folder ({{ step_ca_jwk_RAs_dir }}) used to store the JWK public keys for the RAs is present"
   ansible.builtin.file:
     name: "{{ step_ca_root_dir }}/config/{{ item.name }}/{{ step_ca_jwk_RAs_dir }}"
     owner: "{{ step_ca_user }}"
@@ -162,6 +185,23 @@
     label: "{{ item.name }} Intermediate CA"
   when: inventory_hostname in groups['ca_server']
   become: true
+  tags:
+    - conf
+
+- name: "Export all JWK public keys to the CA"
+  ansible.builtin.copy:
+    src: "/tmp/step-ca-ras-jwks/{{ item.name }}/"
+    dest: "{{ step_ca_root_dir }}/config/{{ item.name }}/{{ step_ca_jwk_RAs_dir }}/"
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_group }}"
+    mode: '0400'
+  with_items: "{{ step_ca_structure.subCA.instances }}"
+  loop_control:
+    label: "{{ item.name }} Intermediate CA"
+  when: inventory_hostname in groups['ca_server']
+  become: true
+  notify:
+    - "Reload step-ca"
   tags:
     - conf
 

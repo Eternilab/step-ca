@@ -1,17 +1,24 @@
 {
-{% if 'ca_server' in group_names %}
 	"root": "{{ step_ca_root_dir }}/certs/root_ca.crt",
 	"federatedRoots": null,
+{% if 'ca_server' in group_names %}
 	"crt": "{{ step_ca_root_dir }}/certs/{{ item.name }}/intermediate_ca.crt",
 	"key": "{{ step_ca_root_dir }}/secrets/{{ item.name }}/intermediate_ca.key",
+{% elif 'ra_servers' in group_names %}
+	"crt": "",
+	"key": "",
 {% endif %}
 	"address": "{{ ansible_default_ipv4.address }}:{{ item.listen_port }}",
+{% if 'ca_server' in group_names %}
 	"insecureAddress": "{{ ansible_default_ipv4.address }}:{{ item.insecure_port }}",
+{% elif 'ra_servers' in group_names %}
+	"insecureAddress": "",
+{% endif %}
 	"dnsNames": [
 {% if 'ca_server' in group_names %}
 		"{{ step_ca_structure.rootCA.fqdn | default(groups['ca_server'][0]) }}"
 {% elif 'ra_servers' in group_names %}
-		"{{ ansible_host }}"
+		"{{ inventory_hostname }}"
 {% endif %}
 	],
 	"logger": {
@@ -26,14 +33,21 @@
 {% if 'ca_server' in group_names %}
 		"provisioners": [
 		],
+		"template": {
+			"country": "{{ item.country }}",
+			"organization": "{{ item.organisation }}",
+			"locality": "{{ item.locality }}",
+			"province": "{{ item.province }}"
+		},
+		"backdate": "1m0s"
 {% elif 'ra_servers' in group_names %}
 		"type": "stepcas",
 		"certificateAuthority": "https://{{ step_ca_structure.rootCA.fqdn | default(groups['ca_server'][0]) }}:{{ item.listen_port }}",
-		"certificateAuthorityFingerprint": "TODO",
+		"certificateAuthorityFingerprint": "{{ hostvars[groups.ca_server.0].rootCA_fingerprint.stdout }}",
 		"certificateIssuer": {
-			"type" : "jwk",
-			"provisioner": "{{ step_ca_admin_jwk_name }}",
-			"key": "{{ step_ca_root_dir }}/secrets/ra_key.pem"
+			"type": "JWK",
+			"provisioner": "ra-{{ inventory_hostname }}",
+			"key": "{{ step_ca_root_dir }}/secrets/{{ item.name }}/ra.pem"
 		},
 		"provisioners": [
 			{
@@ -46,22 +60,10 @@
 					"defaultTLSCertDuration": "{{ item.defaultTLSCertDuration }}",
 					"disableRenewal": false,
 					"enableSSHCA": false
-				},
-				"options": {
-					"x509": {
-						"templateFile": "{{ step_ca_root_dir }}/templates/certs/x509/{{ item.name }}leaf.tpl"
-					}
 				}
 			}
-		],
+		]
 {% endif %}
-		"template": {
-			"country": "{{ item.country }}",
-			"organization": "{{ item.organisation }}",
-			"locality": "{{ item.locality }}",
-			"province": "{{ item.province }}"
-		},
-		"backdate": "1m0s"
 	},
 	"tls": {
 		"cipherSuites": [
