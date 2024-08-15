@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
 WORKDIR="$STEPPATH/config/{{ item.name }}"
-cd $WORKDIR
-echo Building ca_generated.json from ca.json in $WORKDIR
+cd "$WORKDIR" || return
+echo "Building ca_generated.json from ca.json in $WORKDIR"
 cp ca.json ca_generated.json
-cd {{ step_ca_jwk_RAs_dir }}
-if [ -a *.pub.json ]
-then
-  for i in *.pub.json
-  do
+cd "{{ step_ca_jwk_RAs_dir }}" || return
+for i in *.pub.json
+do
+  if [ -a "$i" ]
+  then
     echo "Adding ${i%%.pub.json} JWK provisionner from $WORKDIR/{{ step_ca_jwk_RAs_dir }} directory"
-    step ca provisioner add ${i%%.pub.json} \
-         --ca-config $WORKDIR/ca_generated.json \
+    step ca provisioner add "${i%%.pub.json}" \
+         --ca-config "$WORKDIR/ca_generated.json" \
          --ca-url "{{ step_ca_structure.rootCA.fqdn | default(groups['ca_server'][0]) }}" \
-         --root $STEPPATH/certs/root_ca.crt \
+         --root "$STEPPATH/certs/root_ca.crt" \
          --type JWK \
-         --public-key $i \
+         --public-key "$i" \
          --ssh=false \
          --disable-renewal=false \
          --allow-renewal-after-expiry=false \
@@ -23,7 +23,7 @@ then
          --x509-max-dur "{{ item.maxTLSCertDuration }}" \
          --x509-default-dur "{{ item.defaultTLSCertDuration }}" \
          --x509-template "$STEPPATH/templates/certs/x509/{{ item.name }}/leaf.tpl"
-  done
-else
-  echo "No JWK provisionner *.pub.json found in $WORKDIR/{{ step_ca_jwk_RAs_dir }} directory"
-fi
+  else
+    echo "No JWK provisionner *.pub.json found in $WORKDIR/{{ step_ca_jwk_RAs_dir }} directory"
+  fi
+done
