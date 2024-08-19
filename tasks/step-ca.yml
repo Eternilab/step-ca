@@ -255,14 +255,26 @@
 ###########################
 ### Services started
 
-- name: "Step-ca services is started"
+- name: "Step-ca services is started on CA"
   ansible.builtin.service:
     name: "step-ca-{{ item.name }}.service"
     state: started
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
-  when: not ansible_check_mode and (inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers'])
+  when: not ansible_check_mode and inventory_hostname in groups['ca_server']
+  become: true
+  tags:
+    - conf
+
+- name: "Step-ca services is started on RAs"
+  ansible.builtin.service:
+    name: "step-ca-{{ item.name }}.service"
+    state: started
+  with_items: "{{ step_ca_structure.subCA.instances }}"
+  loop_control:
+    label: "{{ item.name }} Intermediate CA"
+  when: not ansible_check_mode and inventory_hostname in groups['ra_servers']
   become: true
   tags:
     - conf
