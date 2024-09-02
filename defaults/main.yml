@@ -12,8 +12,25 @@ step_ca_version: 0.27.2
 
 # Hardware Architecture of the step-ca server
 # Can be any of :
-# amd64, 383, arm64, armv7, armv6, armv5
-step_ca_arch: amd64
+# amd64, 383, arm64, armv7
+# Linux is the only OS supported because of the binaries available on Github
+#step_ca_arch: is set at the beginning of playbook from the following match list
+step_ca_arch_match:
+  i386: "386"
+  i686: "386"
+  x86_64: "amd64"
+  armv5: "armv5"
+  armv5l: "armv5"
+  armv5h: "armv5"
+  armv6: "armv6"
+  armv6l: "armv6"
+  armv6h: "armv6"
+  armv7: "armv7"
+  armv7l: "armv7"
+  armv7h: "armv7"
+  armv8b: "arm64"
+  armv8l: "arm64"
+  aarch64: "arm64"
 
 # How to install step-ca
 # Can be any of :
@@ -58,14 +75,16 @@ step_ca_url_manual: https://github.com/smallstep/certificates/archive/refs/tags/
 step_ca_tarball_binary: step-ca_linux_{{ step_ca_version }}_{{ step_ca_arch }}.tar.gz
 
 # URL to download binary tarball from
-step_ca_url_binary: https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/{{ step_ca_tarball }}
+step_ca_url_binary: https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/{{ step_ca_tarball_binary }}
 
 #####
 ### Debian installation
 #####
 
+step_ca_deb: step-ca_{{ step_ca_version }}_{{ step_ca_arch }}.deb
+
 # URL to download Debian package from
-step_ca_url_deb: https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/step-ca_{{ step_ca_arch }}.deb
+step_ca_url_deb: https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/{{ step_ca_deb }}
 
 step_ca_apt_state: present
 

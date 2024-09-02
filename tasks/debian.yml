@@ -3,7 +3,7 @@
 - name: "Download Debian package version {{ step_ca_version }} "
   ansible.builtin.get_url:
     url: "{{ step_ca_url_deb }}"
-    dest: "{{ step_ca_tmp_dir }}/step-ca_{{ step_ca_version }}.deb"
+    dest: "{{ step_ca_tmp_dir }}/{{ step_ca_deb }}"
     mode: '0640'
   environment: "{{ proxy_env }}"
   check_mode: false
@@ -13,7 +13,7 @@
 ### Installation
 - name: "Be sure step-ca version is installed (APT based): ({{ step_ca_version }})"
   ansible.builtin.apt:
-    deb: "{{ step_ca_tmp_dir }}/step-ca_{{ step_ca_version }}.deb"
+    deb: "{{ step_ca_tmp_dir }}/{{ step_ca_deb }}"
     state: "{{ step_ca_apt_state }}"
   become: true
   when: ansible_pkg_mgr == 'apt'

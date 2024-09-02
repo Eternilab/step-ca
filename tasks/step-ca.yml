@@ -1,5 +1,20 @@
 ---
 ###########################
+### Facts set
+
+- name: "Show architecture"
+  debug:
+    msg: "Arch : {{ ansible_architecture }}"
+  tags:
+    - install
+
+- name: "Set step_ca_arch variable from facts"
+  set_fact:
+    step_ca_arch: "{{ step_ca_arch_match[ansible_architecture] }}"
+  tags:
+    - install
+
+###########################
 ### Pre-Installation
 
 - name: "Step group exists as a system group for daemon usage"
