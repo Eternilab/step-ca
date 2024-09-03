@@ -45,8 +45,9 @@ step_ca_install_mode: debian
 step_ca_user: step
 step_ca_group: step
 
-# Install files targets
-step_ca_bin_file: /usr/bin/step-ca
+# Install files targets for Manual or Binary mode
+# don't use /usr/bin/step-ca (binary) or /bin/step-ca (usrmerge symlink) which are used by the Debian package !
+step_ca_bin_file: /usr/local/bin/step-ca
 
 # Debian dependencies
 step_ca_debian_dep:

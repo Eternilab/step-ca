@@ -1,5 +1,24 @@
 ---
 ### Gather facts
+
+- name: "Gathering facts : Debian package already installed ?"
+  ansible.builtin.package_facts:
+    manager: apt
+  register: debian_installed
+  tags:
+    - install
+
+- name: "Block Manual install if Debian package is installed on system"
+  ansible.builtin.fail:
+    msg: |-
+      !! -- Error -- !!
+      Debian step-ca package is already installed on system !
+      Uninstall step-ca package and restart playbook.
+      !! -- Error -- !!
+  when: "'step-ca' in debian_installed.packages"
+  tags:
+    - install
+
 - name: "Gathering facts : already installed ?"
   ansible.builtin.stat:
     path: "{{ step_ca_bin_file }}"

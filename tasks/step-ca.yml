@@ -5,23 +5,47 @@
 - name: "Show architecture"
   debug:
     msg: "Arch : {{ ansible_architecture }}"
+  when: "inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']"
   tags:
     - install
 
 - name: "Set step_ca_arch variable from facts"
   set_fact:
     step_ca_arch: "{{ step_ca_arch_match[ansible_architecture] }}"
+  when: "inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']"
   tags:
     - install
 
 ###########################
 ### Pre-Installation
 
+- name: "Check the number of step-ca binaries already present in /usr"
+  ansible.builtin.shell:
+    cmd: "which -a step-ca | grep /usr/ | wc -l"
+  register: step_ca_binaries
+  become: true
+  changed_when: false
+  when: "inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']"
+  tags:
+    - install
+
+- name: "Too many step-ca binaries already present in /usr"
+  ansible.builtin.fail:
+    msg: |-
+      !! -- Error -- !!
+      Too many step-ca binaries already present in /usr !
+      Uninstall/Remove some to have just one and restart playbook.
+      !! -- Error -- !!
+  when: "(inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']) and (step_ca_binaries.stdout is version('1', '>'))"
+  tags:
+    - install
+
 - name: "Step group exists as a system group for daemon usage"
   ansible.builtin.group:
     name: "{{ step_ca_group }}"
     state: present
     system: true
+  when: "inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']"
   become: true
   tags:
     - install
@@ -33,6 +57,7 @@
     group: "{{ step_ca_group }}"
     state: present
     system: true
+  when: "inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']"
   become: true
   tags:
     - install
@@ -42,15 +67,15 @@
 
 - name: "Compile and install using source tarball from Small Steps adding PKCS#11 support"
   ansible.builtin.import_tasks: manual.yml
-  when: step_ca_install_mode == 'manual' and inventory_hostname in groups['ca_server']
+  when: "(inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']) and (step_ca_install_mode == 'manual' and inventory_hostname in groups['ca_server'])"
 
 - name: "Install using binary tarball from Small Steps"
   ansible.builtin.import_tasks: binary.yml
-  when: step_ca_install_mode == 'binary'
+  when: "(inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']) and (step_ca_install_mode == 'binary')"
 
 - name: "Install from Debian packages from Small Steps"
   ansible.builtin.import_tasks: debian.yml
-  when: step_ca_install_mode == 'debian' or (step_ca_install_mode == 'manual' and inventory_hostname in groups['ra_servers'])
+  when: "(inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']) and (step_ca_install_mode == 'debian' or (step_ca_install_mode == 'manual' and inventory_hostname in groups['ra_servers']))"
 
 ###########################
 ### Pre-Configuration

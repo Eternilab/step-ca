@@ -1,4 +1,24 @@
 ---
+### Gather facts
+
+- name: "Gathering facts : Manual/Binary already installed ?"
+  ansible.builtin.stat:
+    path: "{{ step_ca_bin_file }}"
+  register: binary_installed
+  tags:
+    - install
+
+- name: "Block Debian install if Manual/Binary mode executable is present on system"
+  ansible.builtin.fail:
+    msg: |-
+      !! -- Error -- !!
+      Manual/Binary mode executable is present on system !
+      Remove "{{ step_ca_bin_file }}" and restart playbook.
+      !! -- Error -- !!
+  when: binary_installed.stat.exists
+  tags:
+    - install
+
 ### Pre-Installation
 - name: "Download Debian package version {{ step_ca_version }} "
   ansible.builtin.get_url:
