@@ -22,7 +22,7 @@ ra.eternilab.com
 [va_servers]
 va.eternilab.com
 ````
-Le groupe ````ca_server```` contient la machine qui répondra aux demandes de signature. Elle peut éventuellement avoir un HSM connecté (via un port USB par exemple) auquel cas la vairalbe step_ca_yubihsm devra être configurée a True.
+Le groupe ````ca_server```` contient la machine qui répondra aux demandes de signature. Elle peut éventuellement avoir un HSM connecté (via un port USB par exemple) auquel cas la variable step_ca_yubihsm devra être configurée a True.
 
 Le groupe ````ra_servers```` contient les machines qui répondront frontalement aux requêtes ACME pour les clients souhaitant une signature d'une requête de certificat.
 

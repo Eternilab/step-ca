@@ -21,10 +21,18 @@ Environment=STEPPATH=/etc/step-ca
 WorkingDirectory=/etc/step-ca
 {% if 'ca_server' in group_names %}
 ExecStartPre=/etc/step-ca/config/{{ item.name }}/ca-config-updater.sh
+{% if step_ca_install_mode == 'debian' and not step_ca_yubihsm %}
 ExecStart=/usr/bin/step-ca config/{{ item.name }}/ca_generated.json --password-file secrets/{{ item.name }}/intermediate_ca_password.txt
+{% else %}
+ExecStart={{ step_ca_bin_file }} config/{{ item.name }}/ca_generated.json --password-file secrets/{{ item.name }}/intermediate_ca_password.txt
+{% endif %}
 ExecReload=/etc/step-ca/config/{{ item.name }}/ca-config-updater.sh ; /bin/kill --signal HUP $MAINPID
 {% elif 'ra_servers' in group_names %}
+{% if step_ca_install_mode == 'debian' %}
 ExecStart=/usr/bin/step-ca config/{{ item.name }}/ca.json --issuer-password-file secrets/{{ item.name }}/ra_jwk_password.txt
+{% else %}
+ExecStart={{ step_ca_bin_file }} config/{{ item.name }}/ca.json --issuer-password-file secrets/{{ item.name }}/ra_jwk_password.txt
+{% endif %}
 ExecReload=/bin/kill --signal HUP $MAINPID
 {% endif %}
 Restart=on-failure
