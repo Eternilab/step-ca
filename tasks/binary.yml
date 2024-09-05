@@ -15,7 +15,7 @@
       Debian step-ca package is already installed on system !
       Uninstall step-ca package and restart playbook.
       !! -- Error -- !!
-  when: "'step-ca' in debian_installed.packages"
+  when: "'step-ca' in debian_installed.ansible_facts.packages"
   tags:
     - install
 
