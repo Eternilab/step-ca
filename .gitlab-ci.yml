@@ -4,7 +4,7 @@ image: debian:bullseye
 before_script:
   - apt-get update
   - apt-get install -y python-is-python3 python3-pip
-  - pip install ansible ansible-lint
+  - pip install ansible ansible-lint shellcheck
   - ansible-lint --version
 
 stages:
@@ -16,3 +16,12 @@ ansible-lint:
     - debian
   script:
     - ansible-lint --show-relpath
+
+shellcheck:
+  stage: linter
+  tags:
+    - debian
+  script:
+    - >
+      ansible localhost -i production -c local -m template -a "src=roles/step-ca/templates/config/ca-config-updater.sh.j2 dest=./ca-config-updater.sh" --extra-vars='{"item": {"name": "toto", "minTLSCertDuration": "1440h0m0s", "maxTLSCertDuration": "2160h0m0s", "defaultTLSCertDuration": "2160h0m0s"}, "step_ca_jwk_RAs_dir": "step", "ca_server": "ca.example.net"}'
+    - cat ca-config-updater.sh | shellcheck -a -Cauto -f tty -o all -s bash -S style -x -- -
