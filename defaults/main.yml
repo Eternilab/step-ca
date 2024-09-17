@@ -139,10 +139,10 @@ step_ca_structure:
     province: "IDF"
     country: "FR"
     # EC or OKP
-    keytype: EC
+    keytype: "EC"
     # EC: P-256, P-384, P-521
     # OKP: Ed25519
-    keycurve: P-384
+    keycurve: "P-384"
     certDuration: "87600h"
     IssuingCertificateURL: "http://issuers.@{ step_ca_domain }@/root/@{ step_ca_domain }@-CA.der"
     crlDistributionPoints: "http://crl.@{ step_ca_domain }@/root/crl"
@@ -160,7 +160,7 @@ step_ca_structure:
         defaultTLSCertDuration: "2160h0m0s"
         # match: ".*\\.example\\.com"
         min_key_size_rsa: 512
-        extKeyUsage: serverAuth
+        extKeyUsage: "serverAuth"
         IssuingCertificateURL: "http://issuers.{{ step_ca_domain }}/s1/{{ step_ca_domain }}-subCA.der"
         crlDistributionPoints: "http://crl.{{ step_ca_domain }}/s1/crl"
         listen_port: 9100
@@ -175,7 +175,7 @@ step_ca_structure:
         defaultTLSCertDuration: "2160h0m0s"
         # match: ".*\\.example\\.com"
         min_key_size_rsa: 512
-        extKeyUsage: clientAuth
+        extKeyUsage: "clientAuth"
         IssuingCertificateURL: "http://issuers.{{ step_ca_domain }}/c1/{{ step_ca_domain }}-subCA.der"
         crlDistributionPoints: "http://crl.{{ step_ca_domain }}/c1/crl"
         listen_port: 9101

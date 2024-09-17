@@ -295,7 +295,7 @@
 ###########################
 ### Services started
 
-- name: "Step-ca services is started on CA"
+- name: "Step-ca CA services are started"
   ansible.builtin.service:
     name: "step-ca-{{ item.name }}.service"
     state: started
@@ -307,7 +307,7 @@
   tags:
     - conf
 
-- name: "Step-ca services is started on RAs"
+- name: "Step-ca RA services are started"
   ansible.builtin.service:
     name: "step-ca-{{ item.name }}.service"
     state: started
