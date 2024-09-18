@@ -7,7 +7,7 @@ cp ca.json ca_generated.json
 cd "{{ step_ca_jwk_RAs_dir }}" || return
 for i in *.pub.json
 do
-  if [ -a "$i" ]
+  if [ -a "${i}" ]
   then
     echo "Adding ${i%%.pub.json} JWK provisionner from ${WORKDIR}/{{ step_ca_jwk_RAs_dir }} directory"
     step ca provisioner add "${i%%.pub.json}" \
@@ -15,7 +15,7 @@ do
          --ca-url "{{ step_ca_structure.rootCA.fqdn | default(groups['ca_server'][0]) }}" \
          --root "${STEPPATH}/certs/root_ca.crt" \
          --type JWK \
-         --public-key "$i" \
+         --public-key "${i}" \
          --ssh=false \
          --disable-renewal=false \
          --allow-renewal-after-expiry=false \
