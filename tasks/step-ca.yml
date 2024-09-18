@@ -3,14 +3,14 @@
 ### Facts set
 
 - name: "Show architecture"
-  debug:
+  ansible.builtin.debug:
     msg: "Arch : {{ ansible_architecture }}"
   when: "inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']"
   tags:
     - install
 
 - name: "Set step_ca_arch variable from facts"
-  set_fact:
+  ansible.builtin.set_fact:
     step_ca_arch: "{{ step_ca_arch_match[ansible_architecture] }}"
   when: "inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']"
   tags:
@@ -302,7 +302,7 @@
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
-  when: not ansible_check_mode and inventory_hostname in groups['ca_server']
+  when: inventory_hostname in groups['ca_server']
   become: true
   tags:
     - conf
@@ -314,8 +314,41 @@
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
-  when: not ansible_check_mode and inventory_hostname in groups['ra_servers']
+  when: inventory_hostname in groups['ra_servers']
   become: true
+  tags:
+    - conf
+
+- name: "Flush handlers (restart/reload)"
+  meta: flush_handlers
+  when: not ansible_check_mode and (inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers'])
+  tags:
+    - conf
+
+- name: "Gathering facts : services running"
+  ansible.builtin.service_facts:
+  when: inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']
+  tags:
+    - conf
+
+- name: "Are step-ca services really running ?"
+  ansible.builtin.set_fact:
+    step_ca_running_services: "{{ step_ca_running_services | default('') + ('step-ca-' ~ item.name ~ '.service' in ansible_facts.services and ansible_facts.services['step-ca-' ~ item.name ~ '.service'].state=='running' and ' ' or 'step-ca-' ~ item.name ~ ', ') }}"
+  with_items: "{{ step_ca_structure.subCA.instances }}"
+  loop_control:
+    label: "{{ item.name }} Intermediate CA"
+  when: inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']
+  tags:
+    - conf
+
+- name: "Fail if step-ca services are not running on system"
+  ansible.builtin.fail:
+    msg: |-
+      !! -- Error -- !!
+      The service(s) {{ step_ca_running_services }} is/are not running on the system !
+      Something went wrong, look at the logs of the services.
+      !! -- Error -- !!
+  when: (inventory_hostname in groups['ra_servers'] or inventory_hostname in groups['ca_server']) and (step_ca_running_services != " ")
   tags:
     - conf
 
