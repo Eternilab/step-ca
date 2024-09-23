@@ -7,9 +7,11 @@ Ce rôle ansible s'occupe de l'installation d'une Infrastructure de Gestion de C
 Exigeances
 ----------
 
-OS : Debian >= 12
+OS supportés : Toutes les distributions Linux utilisant Systemd
 
-Architecture : amd64
+Architectures supportées : Toutes les architectures suivantes : i386, i686, x86_64, armv5, armv6, armv7, aarch64
+
+Le rôle a été testé avec Debian 12 sur x86_64 et aarch64.
 
 Vous devez définir 3 groupes dans votre inventaire :
 ````{verbatim}
@@ -38,7 +40,6 @@ Les variables "Requises" nécessitent d'être définies dans l'environnement qui
 |------------------------------|---------|----------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------|--------------------------------------------------------------------------------------------------------|
 | step_ca_tmp_dir              | non     | /tmp                                                                                                                                   | string                                 | Dossier utilisé pour télécharger les fichiers temporaires |
 | step_ca_version              | non     | 0.27.2                                                                                                                                 | version                                |  |
-| step_ca_arch                 | non     | amd64                                                                                                                                  | amd64, 383, arm64, armv7, armv6, armv5 | Architecture Matérielle du serveur Step-CA |
 | step_ca_install_mode         | non     | debian                                                                                                                                 | manual, binary, debian                 | De quelle façon installer Step-CA |
 | step_ca_bin_file             | non     | /usr/local/bin/step-ca                                                                                                                 | path                                   | Fichier cible de l'installation pour le binaire|
 | step_ca_tarball_manual       | non     | step-ca_linux_{{ step_ca_version }}.tar.gz                                                                                             | nom de fichier                         | En mode d'installation manuel, nom de fichier cible du téléchargement |
