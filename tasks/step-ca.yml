@@ -331,9 +331,11 @@
   tags:
     - conf
 
+# Careful to keep the space between simple quotes in "... and ' ' or ..." for the step_ca_running_services variable.
+# In case it is changed to "... and '' or ..." the logic doesn't work anymore.
 - name: "Are step-ca services really running ?"
   ansible.builtin.set_fact:
-    step_ca_running_services: "{{ step_ca_running_services | default('') + ('step-ca-' ~ item.name ~ '.service' in ansible_facts.services and ansible_facts.services['step-ca-' ~ item.name ~ '.service'].state=='running' and '' or 'step-ca-' ~ item.name ~ ', ') }}"
+    step_ca_running_services: "{{ step_ca_running_services | default('') + ('step-ca-' ~ item.name ~ '.service' in ansible_facts.services and ansible_facts.services['step-ca-' ~ item.name ~ '.service'].state=='running' and ' ' or 'step-ca-' ~ item.name ~ ', ') }}"
     step_ca_running_services_bool: "{{ 'step-ca-' ~ item.name ~ '.service' in ansible_facts.services and ansible_facts.services['step-ca-' ~ item.name ~ '.service'].state=='running' }}"
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
