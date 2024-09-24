@@ -333,7 +333,8 @@
 
 - name: "Are step-ca services really running ?"
   ansible.builtin.set_fact:
-    step_ca_running_services: "{{ step_ca_running_services | default('') + ('step-ca-' ~ item.name ~ '.service' in ansible_facts.services and ansible_facts.services['step-ca-' ~ item.name ~ '.service'].state=='running' and ' ' or 'step-ca-' ~ item.name ~ ', ') }}"
+    step_ca_running_services: "{{ step_ca_running_services | default('') + ('step-ca-' ~ item.name ~ '.service' in ansible_facts.services and ansible_facts.services['step-ca-' ~ item.name ~ '.service'].state=='running' and '' or 'step-ca-' ~ item.name ~ ', ') }}"
+    step_ca_running_services_bool: "{{ 'step-ca-' ~ item.name ~ '.service' in ansible_facts.services and ansible_facts.services['step-ca-' ~ item.name ~ '.service'].state=='running' }}"
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
@@ -348,7 +349,7 @@
       The service(s) {{ step_ca_running_services }} is/are not running on the system !
       Something went wrong, look at the logs of the services.
       !! -- Error -- !!
-  when: (inventory_hostname in groups['ra_servers'] or inventory_hostname in groups['ca_server']) and (step_ca_running_services != " ")
+  when: (inventory_hostname in groups['ra_servers'] or inventory_hostname in groups['ca_server']) and not step_ca_running_services_bool
   tags:
     - conf
 
