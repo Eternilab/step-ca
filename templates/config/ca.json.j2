@@ -16,7 +16,7 @@
 {% endif %}
 	"dnsNames": [
 {% if 'ca_server' in group_names %}
-		"{{ step_ca_structure.rootCA.fqdn | default(groups['ca_server'][0]) }}"
+		"{{ step_ca_structure.rootCA.fqdn | default(inventory_hostname) }}"
 {% elif 'ra_servers' in group_names %}
 		"{{ inventory_hostname }}"
 {% endif %}
