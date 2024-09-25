@@ -76,6 +76,7 @@ La variable "step_ca_structure" définit la structure de l'IGC. Chacune de ses v
 |     crlDistributionPoints  | URL de CRL               | URL sur lequel récupérer la liste de révocation des certificats       |
 |     listen_port            | port                     | Port sur lequel écoute step-ca en TLS pour RA et CA                   |
 |     insecure_port          | port                     | Port sur lequel écoute step-ca en clair pour servir la CRL sur la CA  |
+|     enabled                | True|False               | Activer ou désactiver le déploiement de cette instance                |
 
 
 Gestion des DNS
