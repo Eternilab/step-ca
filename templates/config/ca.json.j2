@@ -18,7 +18,7 @@
 {% if 'ca_server' in group_names %}
 		"{{ step_ca_structure.rootCA.fqdn | default(inventory_hostname) }}"
 {% elif 'ra_servers' in group_names %}
-		"{{ inventory_hostname }}"
+		"{{ step_ca_ra_fqdn | default(inventory_hostname) }}"
 {% endif %}
 	],
 	"logger": {
