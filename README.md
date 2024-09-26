@@ -57,26 +57,30 @@ Les variables "Requises" nécessitent d'être définies dans l'environnement qui
 
 La variable "step_ca_structure" définit la structure de l'IGC. Chacune de ses valeurs est importante à définir.
 
-| Variable                   | Choix                    | Commentaires                                                          |
-|----------------------------|--------------------------|-----------------------------------------------------------------------|
-| rootCA                     |                          | Clé qui prendra pour valeur les variables relatives à la CA racine    |
-|   fqdn                     |                          | Pour RAs : adresse de la CA & pour CA : validation SNI TLS (optionnel)|
-| subCA                      |                          | Clé qui prendra pour valeur chacune des clés des CA intermédiaires    |
-|   instances                |                          | Liste des instances de subCA                                          |
-|     organisation           | String                   | Nom de la société détentrice du certificat                            |
-|     locality               | Nom de commune           |                                                                       |
-|     province               | Région                   |                                                                       |
-|     country                | Pays                     |                                                                       |
-|     minTLSCertDuration     | String                   | Format "XhYmZs". Durée de vie minimale autorisée pour certificats TLS |
-|     maxTLSCertDuration     | String                   | Format "XhYmZs". Durée de vie maximale autorisée pour certificats TLS |
-|     defaultTLSCertDuration | Valeur horaire en string | Format "XhYmZs". Durée de vie par defaut pour certificats TLS         |
-|     min_key_size_rsa       | Entier                   | Taille minimale autorisée des clés RSA                                |
-|     extKeyUsage            | serverAuth, clientAuth   | Usage cible de la clé. Doit être l'un et seulement un des choix       |
-|     IssuingCertificateURL  | URL de certificat        | URL sur laquel récupérer le certificat                                |
-|     crlDistributionPoints  | URL de CRL               | URL sur lequel récupérer la liste de révocation des certificats       |
-|     listen_port            | port                     | Port sur lequel écoute step-ca en TLS pour RA et CA                   |
-|     insecure_port          | port                     | Port sur lequel écoute step-ca en clair pour servir la CRL sur la CA  |
-|     enabled                | True|False               | Activer ou désactiver le déploiement de cette instance                |
+| Variable                   | Choix                           | Commentaires                                                          |
+|----------------------------|---------------------------------|-----------------------------------------------------------------------|
+| rootCA                     |                                 | Clé qui prendra pour valeur les variables relatives à la CA racine    |
+|   fqdn                     |                                 | Pour RAs : adresse de la CA & pour CA : validation SNI TLS (optionnel)|
+|   IssuingCertificateURL    | Tableau d'URI de certificat     | URL sur laquel récupérer le certificat de la    CA                    |
+|   crlDistributionPoints    | Tableau d'URI de CRL            | URL sur lequel récupérer la liste de révocation des certificats       |
+|   ocspServer               | Tableau d'URI de répondeur OCSP | URL sur lequel contacter le ou les répondeurs OCSP                    |
+| subCA                      |                                 | Clé qui prendra pour valeur chacune des clés des CA intermédiaires    |
+|   instances                |                                 | Liste des instances de subCA                                          |
+|     organisation           | String                          | Nom de la société détentrice du certificat                            |
+|     locality               | Nom de commune                  |                                                                       |
+|     province               | Région                          |                                                                       |
+|     country                | Pays                            |                                                                       |
+|     minTLSCertDuration     | String                          | Format "XhYmZs". Durée de vie minimale autorisée pour certificats TLS |
+|     maxTLSCertDuration     | String                          | Format "XhYmZs". Durée de vie maximale autorisée pour certificats TLS |
+|     defaultTLSCertDuration | Valeur horaire en string        | Format "XhYmZs". Durée de vie par defaut pour certificats TLS         |
+|     min_key_size_rsa       | Entier                          | Taille minimale autorisée des clés RSA                                |
+|     extKeyUsage            | serverAuth, clientAuth          | Usage cible de la clé. Doit être l'un et seulement un des choix       |
+|     IssuingCertificateURL  | Tableau d'URI de certificat     | URL sur laquel récupérer le certificat de la subCA                    |
+|     crlDistributionPoints  | Tableau d'URI de CRL            | URL sur lequel récupérer la liste de révocation des certificats       |
+|     ocspServer             | Tableau d'URI de répondeur OCSP | URL sur lequel contacter le ou les répondeurs OCSP                    |
+|     listen_port            | port                            | Port sur lequel écoute step-ca en TLS pour RA et CA                   |
+|     insecure_port          | port                            | Port sur lequel écoute step-ca en clair pour servir la CRL sur la CA  |
+|     enabled                | True|False                      | Activer ou désactiver le déploiement de cette instance                |
 
 
 Gestion des DNS
