@@ -208,7 +208,7 @@
   when: inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']
   become: true
   notify:
-    - "Reload step-ca"
+    - "Restart step-ca"
   tags:
     - conf
 
