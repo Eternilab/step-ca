@@ -4,7 +4,7 @@ Rôle Step-CA
 Ce rôle ansible s'occupe de l'installation d'une Infrastructure de Gestion de Clefs (IGC) sous Debian et permet l'usage d'un YubiHSM pour stocker les secrets des autorités de certifications.
 
 
-Exigeances
+Exigences
 ----------
 
 OS supportés : Toutes les distributions Linux utilisant Systemd
