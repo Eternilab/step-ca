@@ -8,7 +8,7 @@
 
 step_ca_tmp_dir: /tmp
 
-step_ca_version: 0.27.4
+step_ca_version: 0.28.1
 
 # Hardware Architecture of the step-ca server
 # Can be any of :
@@ -70,13 +70,13 @@ step_ca_tarball_manual: step-ca_linux_{{ step_ca_version }}.tar.gz
 step_ca_url_manual: https://github.com/smallstep/certificates/archive/refs/tags/v{{ step_ca_version }}.tar.gz
 
 #####
-### Binary installation
+### Linux binary installation
 #####
 
 step_ca_tarball_binary: step-ca_linux_{{ step_ca_version }}_{{ step_ca_arch }}.tar.gz
 
 # URL to download binary tarball from
-step_ca_url_binary: https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/{{ step_ca_tarball_binary }}
+step_ca_url_binary: https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/step-ca_linux_{{ step_ca_arch }}.tar.gz
 
 #####
 ### Debian installation
@@ -85,7 +85,7 @@ step_ca_url_binary: https://github.com/smallstep/certificates/releases/download/
 step_ca_deb: step-ca_{{ step_ca_version }}_{{ step_ca_arch }}.deb
 
 # URL to download Debian package from
-step_ca_url_deb: https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/{{ step_ca_deb }}
+step_ca_url_deb: https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/step-ca_{{ step_ca_arch }}.deb
 
 step_ca_apt_state: present
 

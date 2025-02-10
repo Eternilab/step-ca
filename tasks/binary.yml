@@ -29,7 +29,7 @@
 - name: "Download step-ca tarball version {{ step_ca_version }}"
   ansible.builtin.get_url:
     url: "{{ step_ca_url_binary }}"
-    dest: "{{ step_ca_tmp_dir }}"
+    dest: "{{ step_ca_tmp_dir }}/{{ step_ca_tarball_binary }}"
     mode: '0640'
     validate_certs: true
   environment: "{{ proxy_env }}"
