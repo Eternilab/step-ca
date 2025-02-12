@@ -8,6 +8,14 @@
     {{ fail "Not a *.@{ step_ca_domain }@ host" }}
 {% endif %}
   {{ end }}
+  {{- if (and (eq .Type "dns") ({% for ra_host in groups['ra_servers'] %}
+(eq .Value "@{ hostvars[ra_host].step_ca_ra_fqdn | default(ra_host) }@")
+@{- " || " if not loop.last else ")) }}" -}@
+  {% endfor +%}
+    "extKeyUsage": ["serverAuth"],
+  {{- else }}
+    "extKeyUsage": ["@{ item.extKeyUsage }@"],
+  {{- end }}
 {{ end }}
     "subject": {
         "commonName": {{ toJson .Subject.CommonName }}
@@ -21,7 +29,6 @@
 {{- else }}
     "keyUsage": ["digitalSignature"],
 {{- end }}
-    "extKeyUsage": ["@{ item.extKeyUsage }@"],
     "basicConstraints": {
         "isCA": false
     },

@@ -148,6 +148,7 @@
     - "Reload step-ca"
   tags:
     - conf
+    - test
 
 ###########################
 ### Configuration : generate certificates and JWKs
