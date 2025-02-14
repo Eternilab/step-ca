@@ -165,6 +165,7 @@ step_ca_structure:
         crlDistributionPoints: "http://crl.{{ step_ca_domain }}/s1/crl"
         listen_port: 9100
         insecure_port: 8080
+#       sanFilterType: ""
       - name : "C1"
         organisation: "Ma Societe"
         locality: "Paris"
@@ -180,3 +181,4 @@ step_ca_structure:
         crlDistributionPoints: "http://crl.{{ step_ca_domain }}/c1/crl"
         listen_port: 9101
         insecure_port: 8081
+#       sanFilterType: ""

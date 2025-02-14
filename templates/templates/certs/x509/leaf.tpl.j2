@@ -1,13 +1,46 @@
 {
-{{ range .SANs }}
-{% if item.sanFilterType is defined and item.sanFilterType == 'email' %}
-  {{ if not (and (regexMatch ".*\\@@{ step_ca_domain | regex_replace('\.', '\\\\\.') }@" .Value) (eq .Type "email")) }}
-    {{ fail "Not a *@@{ step_ca_domain }@ email" }}
-{% else %}
-  {{ if not (and (regexMatch ".*\\.@{ step_ca_domain | regex_replace('\.', '\\\\\.') }@" .Value) (eq .Type "dns")) }}
-    {{ fail "Not a *.@{ step_ca_domain }@ host" }}
+{% if item.extKeyUsage is defined and item.extKeyUsage != 'serverAuth' %}
+{{ $ra := 0 }}
+{{ $sans := .SANs }}
 {% endif %}
-  {{ end }}
+{{ range .SANs }}
+    {{ if (eq .Type "dns") }}
+{% if item.extKeyUsage is defined and item.extKeyUsage != 'serverAuth' %}
+    {%- if groups['ra_servers']|count is greaterthan 0 %}
+        {{ if (and (eq (len $sans) 1) (eq .Value
+        {%- for ra_host in groups['ra_servers'] %}
+ "@{ hostvars[ra_host].step_ca_ra_fqdn | default(ra_host) }@"
+@{- ")) }}
+            {{ $ra = 1 }}
+" if loop.last -}@
+        {%- endfor %}
+    {%- endif %}
+    {%- if item.sanFilterType is defined and item.sanFilterType == 'email' %}
+        {{ else }}
+            {{ fail "SAN is not an email" }}
+        {{ end }}
+    {{ end }}
+    {{ if (eq .Type "email") }}
+        {{ if (not (regexMatch ".*\\@@{ step_ca_domain | regex_replace('\.', '\\\\\.') }@" .Value)) }}
+            {{ fail "SAN is not a *@@{ step_ca_domain }@ email" }}
+        {{ end }}
+    {% else %}
+        {{ end }}
+        {{ if (not (regexMatch ".*\\.@{ step_ca_domain | regex_replace('\.', '\\\\\.') }@" .Value)) }}
+            {{ fail "SAN is not a *.@{ step_ca_domain }@ host" }}
+        {{ end }}
+    {{ else }}
+        {{ fail "SAN is not a host name" }}
+    {% endif -%}
+    {{ end }}
+{% else %}
+        {{ if (not (regexMatch ".*\\.@{ step_ca_domain | regex_replace('\.', '\\\\\.') }@" .Value)) }}
+            {{ fail "SAN is not a *.@{ step_ca_domain }@ host" }}
+        {{ end }}
+    {{ else }}
+        {{ fail "SAN is not a host name" }}
+    {{ end }}
+{% endif %}
 {{ end }}
     "subject": {
         "commonName": {{ toJson .Subject.CommonName }}
@@ -21,7 +54,15 @@
 {{- else }}
     "keyUsage": ["digitalSignature"],
 {{- end }}
+{% if item.extKeyUsage is defined and item.extKeyUsage != 'serverAuth' %}
+{{- if $ra }}
+    "extKeyUsage": ["serverAuth"],
+{{- else }}
     "extKeyUsage": ["@{ item.extKeyUsage }@"],
+{{- end }}
+{% else %}
+    "extKeyUsage": ["serverAuth"],
+{% endif %}
     "basicConstraints": {
         "isCA": false
     },

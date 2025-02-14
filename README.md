@@ -52,18 +52,28 @@ Les variables "Requises" nécessitent d'être définies dans l'environnement qui
 | step_ca_yubihsm              | non     | false                                                                                                                                  | booléen                                | Stocke les CA intermédiaires sur une YubiHSM (True) ou sur le disque (False). |
 | step_ca_root_dir             | non     | /etc/step-ca                                                                                                                           | dossier                                | |
 | proxy_env                    | non     |                                                                                                                                        | urls de proxys                         | Permet d'accéder à internet |
-| step_ca_ra_fqdn              | non     |                                                                                                                                        | Nom de la machine                      | Nom de la machine servant de RA. Cette variable peut être définie pour chaque machine servant de RA pour permettre de surcharger les noms DNS acceptés par le service step-ca dans le champ SNI de la requête initiale du client lorsque l'on établie une connexion TLS au début d'une session ACME.|
-| step_ca_admin_jwk_name       | oui     |                                                                                                                                        | nom/e-mail                             | Identité de l'administrateur par défaut, utilisée pour créer le premier Json Web Key permettant l'accès admin (provider JWK) au service step-ca|
+| step_ca_ra_fqdn              | non     |                                                                                                                                        | Nom de la machine                      | Nom de la machine servant de RA. Cette variable peut être définie pour chaque machine servant de RA pour permettre de surcharger les noms DNS acceptés par le service step-ca dans le champ SNI de la requête initiale du client lorsque l'on établie une connexion TLS au début d'une session ACME. Cette valeur sera utilisée pour généré le certificat utilisé par la RA sinon par défaut ce sera le nom d'hôte de l'inventaire (voir leaf.tpl) |
+| step_ca_admin_jwk_name       | oui     |                                                                                                                                        | nom/e-mail                             | Identité de l'administrateur par défaut, utilisée pour créer le premier Json Web Key permettant l'accès admin (provider JWK) au service step-ca |
 | step_ca_domain               | oui     |                                                                                                                                        | Nom de domaine                         | Nom du domaine pour lequel signer les certificats. Utilisé dans les templates de certificats des leafs : quand une requête de signature de certificat (CSR) est présentée à la CA, le FQDN dans cette CSR doit se terminer par cette chaîne de caractères pour que la requête soit validée.|
 
-La variable "step_ca_structure" définit la structure de l'IGC. Chacune de ses valeurs est importante à définir.
+La variable "step_ca_structure" définit la structure de l'IGC. Chacune de ses valeurs est importante à définir (toutes ne sont pas indispensables, elles peuvent rester vide pour tout ce qui détaille les emplacements et sanFilterType).
 
 | Variable                   | Choix                    | Commentaires                                                          |
 |----------------------------|--------------------------|-----------------------------------------------------------------------|
 | rootCA                     |                          | Clé qui prendra pour valeur les variables relatives à la CA racine    |
 |   fqdn                     |                          | Pour RAs : adresse de la CA & pour CA : validation SNI TLS (optionnel)|
+|   organisation             |                          | TODO |
+|   locality                 |                          | TODO |
+|   province                 |                          | TODO |
+|   country                  |                          | TODO |
+|   keytype                  |                          | TODO |
+|   keycurve                 |                          | TODO |
+|   certDuration             |                          | TODO |
+|   IssuingCertificateURL    |                          | TODO |
+|   crlDistributionPoints    |                          | TODO |
 | subCA                      |                          | Clé qui prendra pour valeur chacune des clés des CA intermédiaires    |
 |   instances                |                          | Liste des instances de subCA                                          |
+|     name                   | String                   | Nom de l'instance                                                     |
 |     organisation           | String                   | Nom de la société détentrice du certificat                            |
 |     locality               | Nom de commune           |                                                                       |
 |     province               | Région                   |                                                                       |
@@ -77,6 +87,7 @@ La variable "step_ca_structure" définit la structure de l'IGC. Chacune de ses v
 |     crlDistributionPoints  | URL de CRL               | URL sur lequel récupérer la liste de révocation des certificats       |
 |     listen_port            | port                     | Port sur lequel écoute step-ca en TLS pour RA et CA                   |
 |     insecure_port          | port                     | Port sur lequel écoute step-ca en clair pour servir la CRL sur la CA  |
+|     sanFilterType          | Type de filtre           | Peut prendre soit la valeur "email" soit ne pas être définie ou être définie à n'importe quoi d'autre. Filtre utilisé pour permettre de produire des certificats avec des SAN de type email au lieu de DNS. Les SANs dont d'un type ou de l'autre, pas les deux. Les autres types de SANs ne sont pas encore supportés. |
 
 
 Gestion des DNS
