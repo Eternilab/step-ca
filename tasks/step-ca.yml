@@ -91,7 +91,9 @@
   loop: "{{ step_ca_dirlist | product(step_ca_structure.subCA.instances) }}"
   loop_control:
     label: "{{ step_ca_root_dir }}/{{ item[0] }}/{{ item[1].name }}"
-  when: inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']
+  when:
+    - inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']
+    - item[1].enabled | bool
   become: true
   tags:
     - conf
@@ -126,7 +128,9 @@
   loop_control:
     label: "{{ item.name }} Intermediate CA"
   become: true
-  when: inventory_hostname in groups['ca_server']
+  when:
+    - inventory_hostname in groups['ca_server']
+    - item.enabled | bool
   tags:
     - conf
 
@@ -143,7 +147,9 @@
   loop_control:
     label: "{{ item.name }} Intermediate CA"
   become: true
-  when: inventory_hostname in groups['ca_server']
+  when:
+    - inventory_hostname in groups['ca_server']
+    - item.enabled | bool
   notify:
     - "Reload step-ca"
   tags:
@@ -166,6 +172,8 @@
     "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
+  when:
+    - item.enabled | bool
   tags:
     - conf
 
@@ -175,6 +183,8 @@
     "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
+  when:
+    - item.enabled | bool
   tags:
     - conf
 
@@ -205,7 +215,9 @@
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
-  when: inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']
+  when:
+    - inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']
+    - item.enabled | bool
   become: true
   notify:
     - "Restart step-ca"
@@ -223,7 +235,9 @@
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
-  when: inventory_hostname in groups['ca_server']
+  when:
+    - inventory_hostname in groups['ca_server']
+    - item.enabled | bool
   become: true
   tags:
     - conf
@@ -238,7 +252,9 @@
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
-  when: inventory_hostname in groups['ca_server']
+  when:
+    - inventory_hostname in groups['ca_server']
+    - item.enabled | bool
   become: true
   notify:
     - "Reload step-ca"
@@ -255,7 +271,9 @@
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
-  when: inventory_hostname in groups['ca_server']
+  when:
+    - inventory_hostname in groups['ca_server']
+    - item.enabled | bool
   become: true
   notify:
     - "Reload step-ca"
@@ -272,7 +290,9 @@
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
-  when: inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']
+  when:
+    - inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']
+    - item.enabled | bool
   become: true
   notify:
     - Systemd daemon-reload
@@ -287,7 +307,9 @@
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
-  when: not ansible_check_mode and (inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers'])
+  when:
+    - not ansible_check_mode and (inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers'])
+    - item.enabled | bool
   become: true
   tags:
     - conf
@@ -302,7 +324,9 @@
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
-  when: inventory_hostname in groups['ca_server']
+  when:
+    - inventory_hostname in groups['ca_server']
+    - item.enabled | bool
   become: true
   tags:
     - conf
@@ -314,7 +338,9 @@
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
-  when: inventory_hostname in groups['ra_servers']
+  when:
+    - inventory_hostname in groups['ra_servers']
+    - item.enabled | bool
   become: true
   tags:
     - conf
@@ -340,7 +366,9 @@
   with_items: "{{ step_ca_structure.subCA.instances }}"
   loop_control:
     label: "{{ item.name }} Intermediate CA"
-  when: inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']
+  when:
+    - inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']
+    - item.enabled | bool
   tags:
     - conf
 
@@ -351,7 +379,9 @@
       The service(s) {{ step_ca_running_services }} is/are not running on the system !
       Something went wrong, look at the logs of the services.
       !! -- Error -- !!
-  when: (inventory_hostname in groups['ra_servers'] or inventory_hostname in groups['ca_server']) and not step_ca_running_services_bool
+  when:
+    - inventory_hostname in groups['ra_servers'] or inventory_hostname in groups['ca_server']
+    - not step_ca_running_services_bool | default(True)
   tags:
     - conf
 

@@ -25,6 +25,7 @@
     "basicConstraints": {
         "isCA": false
     },
-    "IssuingCertificateURL": ["@{ item.IssuingCertificateURL }@"],
-    "crlDistributionPoints": ["@{ item.crlDistributionPoints }@"]
+    "IssuingCertificateURL": [{% for uri in item.IssuingCertificateURL | default([]) %}"@{ uri }@"{% if not loop.last %},{% endif %}{% endfor %}],
+    "crlDistributionPoints": [{% for uri in item.crlDistributionPoints | default([]) %}"@{ uri }@"{% if not loop.last %},{% endif %}{% endfor %}],
+    "ocspServer": [{% for uri in item.ocspServer | default([]) %}"@{ uri }@"{% if not loop.last %},{% endif %}{% endfor %}]
 }
