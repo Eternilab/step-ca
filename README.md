@@ -88,6 +88,7 @@ La variable "step_ca_structure" définit la structure de l'IGC. Chacune de ses v
 |     listen_port            | port                     | Port sur lequel écoute step-ca en TLS pour RA et CA                   |
 |     insecure_port          | port                     | Port sur lequel écoute step-ca en clair pour servir la CRL sur la CA  |
 |     sanFilterType          | Type de filtre           | Peut prendre soit la valeur "email" soit ne pas être définie ou être définie à n'importe quoi d'autre. Filtre utilisé pour permettre de produire des certificats avec des SAN de type email au lieu de DNS. Les SANs dont d'un type ou de l'autre, pas les deux. Les autres types de SANs ne sont pas encore supportés. |
+|     enabled                | True|False               | Activer ou désactiver le déploiement de cette instance                |
 
 
 Gestion des DNS

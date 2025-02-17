@@ -166,6 +166,7 @@ step_ca_structure:
         listen_port: 9100
         insecure_port: 8080
 #       sanFilterType: ""
+        enabled: True
       - name : "C1"
         organisation: "Ma Societe"
         locality: "Paris"
@@ -182,3 +183,4 @@ step_ca_structure:
         listen_port: 9101
         insecure_port: 8081
 #       sanFilterType: ""
+        enabled: True
