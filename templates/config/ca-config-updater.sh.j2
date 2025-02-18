@@ -7,7 +7,7 @@ cp ca.json ca_generated.json
 cd "{{ step_ca_jwk_RAs_dir }}" || return
 for i in *.pub.json
 do
-  if [ -a "${i}" ]
+  if [[ -a "${i}" ]]
   then
     echo "Adding ${i%%.pub.json} JWK provisionner from ${WORKDIR}/{{ step_ca_jwk_RAs_dir }} directory"
     step ca provisioner add "${i%%.pub.json}" \
