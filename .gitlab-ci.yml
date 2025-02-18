@@ -1,26 +1,24 @@
-# image: registry.gitlab.com/pipeline-components/ansible-lint:latest
-image: debian:bookworm
-
-before_script:
-  - apt-get update
-  - apt-get install -y python-is-python3 python3-pip shellcheck
-  - pip install ansible ansible-lint
-  - ansible-lint --version
-
+---
 stages:
   - linter
 
 ansible-lint:
+  image: registry.gitlab.com/pipeline-components/ansible-lint:latest
   stage: linter
   tags:
-    - debian
+    - linux
   script:
+    - ansible-lint --version
     - ansible-lint --show-relpath
 
 shellcheck:
+  image: debian:bookworm
   stage: linter
   tags:
     - debian
+  before_script:
+    - apt-get update
+    - apt-get install -y shellcheck ansible
   script:
     - >
       ansible -vvvv localhost -c local -m template -a "src=templates/config/ca-config-updater.sh.j2 dest=./ca-config-updater.sh" --extra-vars='{"item": {"name": "toto", "minTLSCertDuration": "1440h0m0s", "maxTLSCertDuration": "2160h0m0s", "defaultTLSCertDuration": "2160h0m0s"}, "step_ca_jwk_RAs_dir": "step", "step_ca_structure" : { "rootCA" : {"fqdn" : "ca.example.net"}}}'
