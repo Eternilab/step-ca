@@ -8,7 +8,7 @@
 
 step_ca_tmp_dir: /tmp
 
-step_ca_version: 0.28.1
+step_ca_version: 0.30.2
 
 # Hardware Architecture of the step-ca server
 # Can be any of :
