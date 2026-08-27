@@ -5,14 +5,18 @@
 - name: "Show architecture"
   ansible.builtin.debug:
     msg: "Arch : {{ ansible_architecture }}"
-  when: "inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']"
+  when:
+    inventory_hostname in groups['ca_server']
+    or inventory_hostname in groups['ra_servers']
   tags:
     - install
 
 - name: "Set step_ca_arch variable from facts"
   ansible.builtin.set_fact:
     step_ca_arch: "{{ step_ca_arch_match[ansible_architecture] }}"
-  when: "inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']"
+  when:
+    inventory_hostname in groups['ca_server']
+    or inventory_hostname in groups['ra_servers']
   tags:
     - install
 
@@ -25,7 +29,10 @@
   register: step_ca_binaries
   become: true
   changed_when: false
-  when: "inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']"
+  when:
+    (inventory_hostname in groups['ca_server']
+    or inventory_hostname in groups['ra_servers'])
+  check_mode: false
   tags:
     - install
 
@@ -36,7 +43,10 @@
       Too many step-ca binaries already present in /usr !
       Uninstall/Remove some to have just one and restart playbook.
       !! -- Error -- !!
-  when: "(inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']) and (step_ca_binaries.stdout is version('1', '>'))"
+  when:
+    (inventory_hostname in groups['ca_server']
+    or inventory_hostname in groups['ra_servers'])
+    and (step_ca_binaries.stdout is version('1', '>'))
   tags:
     - install
 
@@ -45,7 +55,9 @@
     name: "{{ step_ca_group }}"
     state: present
     system: true
-  when: "inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']"
+  when:
+    inventory_hostname in groups['ca_server']
+    or inventory_hostname in groups['ra_servers']
   become: true
   tags:
     - install
@@ -57,7 +69,9 @@
     group: "{{ step_ca_group }}"
     state: present
     system: true
-  when: "inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']"
+  when:
+    inventory_hostname in groups['ca_server']
+    or inventory_hostname in groups['ra_servers']
   become: true
   tags:
     - install
@@ -65,17 +79,30 @@
 ###########################
 ### Installation
 
-- name: "Compile and install using source tarball from Small Steps adding PKCS#11 support"
+- name: "Compile and install using source tarball adding PKCS#11 support"
   ansible.builtin.import_tasks: manual.yml
-  when: "step_ca_install_mode == 'manual' and (inventory_hostname in groups['ra_servers'] or inventory_hostname in groups['ca_server']) or step_ca_yubihsm and inventory_hostname in groups['ca_server']"
+  when:
+    step_ca_install_mode == 'manual'
+    and (inventory_hostname in groups['ra_servers']
+    or inventory_hostname in groups['ca_server'])
+    or step_ca_yubihsm
+    and inventory_hostname in groups['ca_server']
 
 - name: "Install using binary tarball from Small Steps"
   ansible.builtin.import_tasks: binary.yml
-  when: "step_ca_install_mode == 'binary' and (inventory_hostname in groups['ra_servers'] or inventory_hostname in groups['ca_server'] and not step_ca_yubihsm)"
+  when:
+    step_ca_install_mode == 'binary'
+    and (inventory_hostname in groups['ra_servers']
+    or inventory_hostname in groups['ca_server']
+    and not step_ca_yubihsm)
 
 - name: "Install from Debian packages from Small Steps"
   ansible.builtin.import_tasks: debian.yml
-  when: "step_ca_install_mode == 'debian' and (inventory_hostname in groups['ra_servers'] or inventory_hostname in groups['ca_server'] and not step_ca_yubihsm)"
+  when:
+    step_ca_install_mode == 'debian'
+    and (inventory_hostname in groups['ra_servers']
+    or inventory_hostname in groups['ca_server']
+    and not step_ca_yubihsm)
 
 ###########################
 ### Pre-Configuration
@@ -201,6 +228,7 @@
   register: rootCA_fingerprint
   when: inventory_hostname in groups['ca_server']
   changed_when: false
+  check_mode: false
   become: true
   tags:
     - conf
@@ -224,9 +252,11 @@
   tags:
     - conf
 
-- name: "The folder ({{ step_ca_jwk_RAs_dir }}) used to store the JWK public keys for the RAs is present"
+- name: "The folder used to store the JWK public keys for the RAs is present
+  : {{ step_ca_jwk_RAs_dir }}"
   ansible.builtin.file:
-    name: "{{ step_ca_root_dir }}/config/{{ item.name }}/{{ step_ca_jwk_RAs_dir }}"
+    name:
+      "{{ step_ca_root_dir }}/config/{{ item.name }}/{{ step_ca_jwk_RAs_dir }}"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
     mode: '0700'
@@ -245,7 +275,8 @@
 - name: "Export all JWK public keys to the CA"
   ansible.builtin.copy:
     src: "/tmp/step-ca-ras-jwks/{{ item.name }}/"
-    dest: "{{ step_ca_root_dir }}/config/{{ item.name }}/{{ step_ca_jwk_RAs_dir }}/"
+    dest:
+      "{{ step_ca_root_dir }}/config/{{ item.name }}/{{ step_ca_jwk_RAs_dir }}/"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
     mode: '0400'
@@ -255,13 +286,16 @@
   when:
     - inventory_hostname in groups['ca_server']
     - item.enabled | bool
+    - not ansible_check_mode
   become: true
   notify:
     - "Reload step-ca"
   tags:
     - conf
 
-- name: "The ca-config-updater.sh Bash script used to inject the RAs JWK public key as provisionner into the running configuration is present"
+- name:
+    "The ca-config-updater.sh Bash script used to inject the RAs JWK public
+     key as provisionner into the running configuration is present"
   ansible.builtin.template:
     src: "config/ca-config-updater.sh.j2"
     dest: "{{ step_ca_root_dir }}/config/{{ item.name }}/ca-config-updater.sh"
@@ -308,7 +342,10 @@
   loop_control:
     label: "{{ item.name }} Intermediate CA"
   when:
-    - not ansible_check_mode and (inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers'])
+    -
+      not ansible_check_mode
+      and (inventory_hostname in groups['ca_server']
+      or inventory_hostname in groups['ra_servers'])
     - item.enabled | bool
   become: true
   tags:
@@ -353,7 +390,9 @@
 
 - name: "Gathering facts : services running"
   ansible.builtin.service_facts:
-  when: inventory_hostname in groups['ca_server'] or inventory_hostname in groups['ra_servers']
+  when:
+    inventory_hostname in groups['ca_server']
+    or inventory_hostname in groups['ra_servers']
   tags:
     - conf
 
@@ -380,7 +419,9 @@
       Something went wrong, look at the logs of the services.
       !! -- Error -- !!
   when:
-    - inventory_hostname in groups['ra_servers'] or inventory_hostname in groups['ca_server']
+    -
+      inventory_hostname in groups['ra_servers']
+      or inventory_hostname in groups['ca_server']
     - not step_ca_running_services_bool | default(True)
   tags:
     - conf
@@ -390,7 +431,7 @@
 
 - name: "There is no root CA private key left in secret folder"
   ansible.builtin.stat:
-    name: "{{ step_ca_root_dir}}/secrets/root_ca.key"
+    name: "{{ step_ca_root_dir }}/secrets/root_ca.key"
   register: ca_key_left
   become: true
   when: inventory_hostname in groups['ca_server']
@@ -414,8 +455,10 @@
       !! -- Warning -- !!
       CA private key or password left in secret folder
       !! -- Warning -- !!
-  when: inventory_hostname in groups['ca_server'] and (ca_password_root_left.stat.exists or ca_key_left.stat.exists)
+  when:
+    inventory_hostname in groups['ca_server']
+    and (ca_password_root_left.stat.exists
+    or ca_key_left.stat.exists)
   changed_when: true
   tags:
     - conf
-

@@ -1,7 +1,10 @@
+---
 ###########################
 ### Configuration des clefs intermédiaires
 
-- name: "Check if {{ item.name }} intermediate CA instance public key/certificate exists"
+- name:
+    "Check if intermediate CA instance public key/certificate exists
+    : {{ item.name }}"
   ansible.builtin.stat:
     name: "{{ step_ca_root_dir }}/certs/{{ item.name }}/intermediate_ca.crt"
   register: ca_pub_key
@@ -10,22 +13,30 @@
   tags:
     - conf
 
-- name: "Generate random password for {{ item.name }} intermediate CA instance if none set"
+- name:
+    "Generate random password for intermediate CA instance if none set
+    : {{ item.name }}"
   ansible.builtin.set_fact:
     intermediate_ca_password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_letters', 'digits', 'punctuation']) }}"
-  when: inventory_hostname in groups['ca_server'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  when:
+    inventory_hostname in groups['ca_server']
+    and not step_ca_yubihsm
+    and not ca_pub_key.stat.exists
   no_log: true
   tags:
     - conf
 
-- name: "Create password file for {{ item.name }} intermediate CA instance"
+- name: "Create password file for intermediate CA instance: {{ item.name }}"
   ansible.builtin.template:
     src: "secrets/intermediate_ca_password.txt.j2"
     dest: "{{ step_ca_root_dir }}/secrets/{{ item.name }}/intermediate_ca_password.txt"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
     mode: '0400'
-  when: inventory_hostname in groups['ca_server'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  when:
+    inventory_hostname in groups['ca_server']
+    and not step_ca_yubihsm
+    and not ca_pub_key.stat.exists
   no_log: true
   become: true
   notify:
@@ -33,7 +44,8 @@
   tags:
     - conf
 
-- name: "Create intermediate {{ item.name }} CA instance private and public keys"
+- name:
+    "Create intermediate CA instance private and public keys: {{ item.name }}"
   ansible.builtin.command:
     argv:
       - step
@@ -58,7 +70,10 @@
       - "{{ item.name }} Intermediate CA"
       - "{{ step_ca_root_dir }}/certs/{{ item.name }}/intermediate_ca.crt"
       - "{{ step_ca_root_dir }}/secrets/{{ item.name }}/intermediate_ca.key"
-  when: inventory_hostname in groups['ca_server'] and not step_ca_yubihsm and not ca_pub_key.stat.exists
+  when:
+    inventory_hostname in groups['ca_server']
+    and not step_ca_yubihsm
+    and not ca_pub_key.stat.exists
   become: true
   changed_when: true
   notify:
@@ -66,28 +81,40 @@
   tags:
     - conf
 
-- name: "Check intermediate {{ item.name }} CA instance private key ownership and rights"
+- name:
+    "Check intermediate CA instance private key ownership and rights
+    : {{ item.name }}"
   ansible.builtin.file:
     name: "{{ step_ca_root_dir }}/secrets/{{ item.name }}/intermediate_ca.key"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
     mode: '0400'
     state: file
-  when: not ansible_check_mode and (inventory_hostname in groups['ca_server'] and not step_ca_yubihsm and not ca_pub_key.stat.exists)
+  when:
+    not ansible_check_mode
+    and (inventory_hostname in groups['ca_server']
+    and not step_ca_yubihsm
+    and not ca_pub_key.stat.exists)
   become: true
   notify:
     - "Reload step-ca"
   tags:
     - conf
 
-- name: "Check intermediate {{ item.name }} CA instance public key/certificate ownership and rights"
+- name:
+    "Check intermediate CA instance public key/certificate ownership and rights
+    : {{ item.name }}"
   ansible.builtin.file:
     name: "{{ step_ca_root_dir }}/certs/{{ item.name }}/intermediate_ca.crt"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
     mode: '0400'
     state: file
-  when: not ansible_check_mode and (inventory_hostname in groups['ca_server'] and not step_ca_yubihsm and not ca_pub_key.stat.exists)
+  when:
+    not ansible_check_mode
+    and (inventory_hostname in groups['ca_server']
+    and not step_ca_yubihsm
+    and not ca_pub_key.stat.exists)
   become: true
   notify:
     - "Reload step-ca"

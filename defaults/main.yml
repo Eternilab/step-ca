@@ -14,7 +14,7 @@ step_ca_version: 0.30.2
 # Can be any of :
 # amd64, 383, arm64, armv7
 # Linux is the only OS supported because of the binaries available on Github
-#step_ca_arch: is set at the beginning of playbook from the following match list
+# step_ca_arch: is set at the beginning of playbook from the following match list
 step_ca_arch_match:
   i386: "386"
   i686: "386"
@@ -131,9 +131,9 @@ proxy_env:
 
 step_ca_structure:
   rootCA:
-# FQDN can optionally be defined, if not, the machine name in the inventory group ca_server will be used
-# It is used on the RAs as an address to contact the CA host and on the CA to validate the TLS SNI send by the TLS clients
-#    fqdn: "ca.{{ step_ca_domain }}"
+    # FQDN can optionally be defined, if not, the machine name in the inventory group ca_server will be used
+    # It is used on the RAs as an address to contact the CA host and on the CA to validate the TLS SNI send by the TLS clients
+    #    fqdn: "ca.{{ step_ca_domain }}"
     organisation: "Ma Societe"
     locality: "Paris"
     province: "IDF"
@@ -165,8 +165,8 @@ step_ca_structure:
         crlDistributionPoints: "http://crl.{{ step_ca_domain }}/s1/crl"
         listen_port: 9100
         insecure_port: 8080
-#       sanFilterType: ""
-        enabled: True
+        # sanFilterType: ""
+        enabled: true
       - name : "C1"
         organisation: "Ma Societe"
         locality: "Paris"
@@ -183,4 +183,4 @@ step_ca_structure:
         listen_port: 9101
         insecure_port: 8081
 #       sanFilterType: ""
-        enabled: True
+        enabled: true

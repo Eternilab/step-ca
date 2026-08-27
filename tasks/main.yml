@@ -5,9 +5,9 @@
 #   tags:
 #     - step-ca
 
-- name: "Version test"
+- name: "Version check"
   ansible.builtin.fail:
-    msg: The step_ca_version variable isn't defined
+    msg: "The step_ca_version variable isn't defined"
   when: step_ca_version is undefined
   tags:
     - step-ca

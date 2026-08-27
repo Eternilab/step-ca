@@ -1,7 +1,8 @@
+---
 ###########################
 ### Configuration des clefs JWK des RAs
 
-- name: "JWK public key used to connect to the {{ item.name }} CA exists on RA"
+- name: "JWK public key used to connect to the CA exists on RA: {{ item.name }}"
   ansible.builtin.stat:
     name: "{{ step_ca_root_dir }}/certs/{{ item.name }}/ra.pub.json"
   register: ca_pub_key
@@ -10,7 +11,8 @@
   tags:
     - conf
 
-- name: "PEM private key used to connect to the {{ item.name }} CA exists on RA"
+- name:
+    "PEM private key used to connect to the CA exists on RA: {{ item.name }}"
   ansible.builtin.stat:
     name: "{{ step_ca_root_dir }}/secrets/{{ item.name }}/ra.pem"
   register: ca_priv_key
@@ -19,22 +21,32 @@
   tags:
     - conf
 
-- name: "Generate random password for JWK private key used to connect to the {{ item.name }} CA"
+- name:
+    "Generate random password for JWK private key used to connect to the CA
+    : {{ item.name }}"
   ansible.builtin.set_fact:
     ra_jwk_password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_letters', 'digits', 'punctuation']) }}"
-  when: inventory_hostname in groups['ra_servers'] and (not ca_pub_key.stat.exists or not ca_priv_key.stat.exists)
+  when:
+    inventory_hostname in groups['ra_servers']
+    and (not ca_pub_key.stat.exists
+    or not ca_priv_key.stat.exists)
   no_log: true
   tags:
     - conf
 
-- name: "Create password file for JWK private key used to connect to the {{ item.name }} CA"
+- name:
+    "Create password file for JWK private key used to connect to the CA
+    : {{ item.name }}"
   ansible.builtin.template:
     src: "secrets/ra_jwk_password.txt.j2"
     dest: "{{ step_ca_root_dir }}/secrets/{{ item.name }}/ra_jwk_password.txt"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
     mode: '0400'
-  when: inventory_hostname in groups['ra_servers'] and (not ca_pub_key.stat.exists or not ca_priv_key.stat.exists)
+  when:
+    inventory_hostname in groups['ra_servers']
+    and (not ca_pub_key.stat.exists
+    or not ca_priv_key.stat.exists)
   no_log: true
   become: true
   notify:
@@ -42,7 +54,7 @@
   tags:
     - conf
 
-- name: "Create JWK pair used to connect to the {{ item.name }} CA"
+- name: "Create JWK pair used to connect to the CA: {{ item.name }}"
   ansible.builtin.command:
     argv:
       - step
@@ -54,7 +66,10 @@
       - --password-file
       - "{{ step_ca_root_dir }}/secrets/{{ item.name }}/ra_jwk_password.txt"
       - --force
-  when: inventory_hostname in groups['ra_servers'] and (not ca_pub_key.stat.exists or not ca_priv_key.stat.exists)
+  when:
+    inventory_hostname in groups['ra_servers']
+    and (not ca_pub_key.stat.exists
+    or not ca_priv_key.stat.exists)
   become: true
   changed_when: true
   notify:
@@ -75,7 +90,10 @@
       - "{{ step_ca_root_dir }}/secrets/{{ item.name }}/ra.json"
       - --out
       - "{{ step_ca_root_dir }}/secrets/{{ item.name }}/ra.pem"
-  when: inventory_hostname in groups['ra_servers'] and (not ca_pub_key.stat.exists or not ca_priv_key.stat.exists)
+  when:
+    inventory_hostname in groups['ra_servers']
+    and (not ca_pub_key.stat.exists
+    or not ca_priv_key.stat.exists)
   become: true
   changed_when: true
   notify:
@@ -83,28 +101,40 @@
   tags:
     - conf
 
-- name: "Ownership and rights for JWK public key used to connect to the {{ item.name }} CA"
+- name:
+    "Ownership and rights for JWK public key used to connect to the CA
+    : {{ item.name }}"
   ansible.builtin.file:
     name: "{{ step_ca_root_dir }}/certs/{{ item.name }}/ra.pub.json"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
     mode: '0400'
     state: file
-  when: inventory_hostname in groups['ra_servers'] and (not ansible_check_mode or (ansible_check_mode and ca_pub_key.stat.exists))
+  when:
+    inventory_hostname in groups['ra_servers']
+    and (not ansible_check_mode
+    or (ansible_check_mode
+    and ca_pub_key.stat.exists))
   become: true
   notify:
     - "Reload step-ca"
   tags:
     - conf
 
-- name: "Ownership and rights for PEM private encrypted key used to connect to the {{ item.name }} CA"
+- name:
+    "Ownership and rights for PEM private encrypted key used to connect to
+     the CA: {{ item.name }}"
   ansible.builtin.file:
     name: "{{ step_ca_root_dir }}/secrets/{{ item.name }}/ra.pem"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_group }}"
     mode: '0400'
     state: file
-  when: inventory_hostname in groups['ra_servers'] and (not ansible_check_mode or (ansible_check_mode and ca_priv_key.stat.exists))
+  when:
+    inventory_hostname in groups['ra_servers']
+    and (not ansible_check_mode
+    or (ansible_check_mode
+    and ca_priv_key.stat.exists))
   become: true
   notify:
     - "Reload step-ca"
@@ -114,10 +144,12 @@
 - name: "Import JWK public key to Ansible control node"
   ansible.builtin.fetch:
     src: "{{ step_ca_root_dir }}/certs/{{ item.name }}/ra.pub.json"
-    dest: /tmp/step-ca-ras-jwks/{{ item.name }}/ra-{{ inventory_hostname }}.pub.json
-    flat: yes
+    dest:
+      /tmp/step-ca-ras-jwks/{{ item.name }}/ra-{{ inventory_hostname }}.pub.json
+    flat: true
   become: true
-  when: inventory_hostname in groups['ra_servers'] and not ansible_check_mode
+  when:
+    inventory_hostname in groups['ra_servers']
+    and not ansible_check_mode
   tags:
     - conf
-

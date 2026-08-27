@@ -1,3 +1,4 @@
+---
 ###########################
 ### Configuration des clefs racines
 
@@ -64,7 +65,9 @@
     group: "{{ step_ca_group }}"
     mode: '0400'
     state: file
-  when: not ansible_check_mode and (not step_ca_yubihsm and not ca_pub_key.stat.exists)
+  when:
+    not ansible_check_mode
+    and (not step_ca_yubihsm and not ca_pub_key.stat.exists)
   become: true
   tags:
     - conf
@@ -76,7 +79,9 @@
     group: "{{ step_ca_group }}"
     mode: '0400'
     state: file
-  when: not ansible_check_mode and (not step_ca_yubihsm and not ca_pub_key.stat.exists)
+  when:
+    not ansible_check_mode
+    and (not step_ca_yubihsm and not ca_pub_key.stat.exists)
   become: true
   tags:
     - conf
